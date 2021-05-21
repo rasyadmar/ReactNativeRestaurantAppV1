@@ -1,0 +1,3 @@
+when runnig json-server give flag -H 0.0.0.0 to make the emulator in pc readable from android with 0.0.0.0 address
+run with this command json-server --watch ./fakeAPI/db.json -H 0.0.0.0 -P 3004
+then adb reverse tcp:3004 tcp:3004

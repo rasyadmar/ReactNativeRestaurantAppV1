@@ -1,0 +1,213 @@
+{
+  "pesanan": [],
+  "MenuMakanan":[
+    {
+      "id": "1makan", 
+      "item": "Ayam Goreng", 
+      "jumlah": 2, 
+      "harga": 1000
+    },
+    {
+      "id": "2makan", 
+      "item": "Ayam Panggang", 
+      "jumlah": 3,
+      "harga": 2000
+    },
+    {
+      "id": "3makan", 
+      "item": "Ayam Opor", 
+      "jumlah": 2, 
+      "harga": 3000
+    },
+    {
+      "id": "4makan", 
+      "item": "Bebek Goreng", 
+      "jumlah": 3, 
+      "harga": 1200
+    },
+    {
+      "id": "5makan", 
+      "item": "Bebek Panggang", 
+      "jumlah": 2, 
+      "harga": 1320
+    },
+    {
+      "id": "6makan", 
+      "item": "Ikan Goreng", 
+      "jumlah": 3, 
+      "harga": 1000
+    },
+    {
+      "id": "7makan", 
+      "item": "Ikan Bakar", 
+      "jumlah": 2, 
+      "harga": 1000
+    },
+    {"id": "8makan", 
+      "item": "Sup Ikan", 
+      "jumlah": 3, 
+      "harga": 1000
+    }
+  ],
+  "MenuMinuman":[
+    {
+      "id": "1minum", 
+      "item": "Teh", 
+      "jumlah": 2, 
+      "harga": 1000
+    },
+    {
+      "id": "2minum", 
+      "item": "Jeruk", 
+      "jumlah": 3,
+      "harga": 2000
+    },
+    {
+      "id": "3minum", 
+      "item": "Kopi", 
+      "jumlah": 2, 
+      "harga": 3000
+    },
+    {
+      "id": "4minum", 
+      "item": "Air Putih", 
+      "jumlah": 3, 
+      "harga": 1200
+    },
+    {
+      "id": "5minum", 
+      "item": "Jus Jambu", 
+      "jumlah": 2, 
+      "harga": 1320
+    },
+    {
+      "id": "6minum", 
+      "item": "Jus Mangga", 
+      "jumlah": 3, 
+      "harga": 1000
+    },
+    {
+      "id": "7minum", 
+      "item": "Jus Duren", 
+      "jumlah": 2, 
+      "harga": 1000
+    },
+    {"id": "8minum", 
+      "item": "Jus Alpukat", 
+      "jumlah": 3, 
+      "harga": 1000
+    }
+    ],
+    "MenuSemua":[
+      {
+      "id": "1", 
+      "item": "Ayam Goreng", 
+      "jumlah": 2, 
+      "harga": 1000,
+      "jenis":"makanan"
+    },
+    {
+      "id": "2", 
+      "item": "Ayam Panggang", 
+      "jumlah": 3,
+      "harga": 2000,
+      "jenis":"makanan"
+    },
+    {
+      "id": "3", 
+      "item": "Ayam Opor", 
+      "jumlah": 2, 
+      "harga": 3000,
+      "jenis":"makanan"
+    },
+    {
+      "id": "4", 
+      "item": "Bebek Goreng", 
+      "jumlah": 3, 
+      "harga": 1200,
+      "jenis":"makanan"
+    },
+    {
+      "id": "5", 
+      "item": "Bebek Panggang", 
+      "jumlah": 2, 
+      "harga": 1320,
+      "jenis":"makanan"
+    },
+    {
+      "id": "6", 
+      "item": "Ikan Goreng", 
+      "jumlah": 3, 
+      "harga": 1000,
+      "jenis":"makanan"
+    },
+    {
+      "id": "7", 
+      "item": "Ikan Bakar", 
+      "jumlah": 2, 
+      "harga": 1000,
+      "jenis":"makanan"
+    },
+    {"id": "8", 
+      "item": "Sup Ikan", 
+      "jumlah": 3, 
+      "harga": 1000,
+      "jenis":"makanan"
+    },
+      {
+        "id": "1", 
+        "item": "Teh", 
+        "jumlah": 2, 
+        "harga": 1000,
+        "jenis":"minuman"
+      },
+      {
+        "id": "2", 
+        "item": "Jeruk", 
+        "jumlah": 3,
+        "harga": 2000,
+        "jenis":"minuman"
+      },
+      {
+        "id": "3", 
+        "item": "Kopi", 
+        "jumlah": 2, 
+        "harga": 3000,
+        "jenis":"minuman"
+      },
+      {
+        "id": "4", 
+        "item": "Air Putih", 
+        "jumlah": 3, 
+        "harga": 1200,
+        "jenis":"minuman"
+      },
+      {
+        "id": "5", 
+        "item": "Jus Jambu", 
+        "jumlah": 2, 
+        "harga": 1320,
+        "jenis":"minuman"
+      },
+      {
+        "id": "6", 
+        "item": "Jus Mangga", 
+        "jumlah": 3, 
+        "harga": 1000,
+        "jenis":"minuman"
+      },
+      {
+        "id": "7", 
+        "item": "Jus Duren", 
+        "jumlah": 2, 
+        "harga": 1000,
+        "jenis":"minuman"
+      },
+      {"id": "8", 
+        "item": "Jus Alpukat", 
+        "jumlah": 3, 
+        "harga": 1000,
+        "jenis":"minuman"
+      }
+      ]
+}

@@ -9,13 +9,13 @@ import {
 import {useState, useEffect} from 'react/cjs/react.development';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
-import ItemMenuTerjual from './itemMenuTerjual';
+import ItemMenuTerjual from './itemTotalTerjual';
 
 let dummyDataMinggu = [
-  {minggu: 'Minggu 1', terjual: 34},
-  {minggu: 'Minggu 2', terjual: 24},
-  {minggu: 'Minggu 3', terjual: 40},
-  {minggu: 'Minggu 4', terjual: 50},
+  {minggu: 'Minggu 1', totalHarga: 425310000},
+  {minggu: 'Minggu 2', totalHarga: 524315000},
+  {minggu: 'Minggu 3', totalHarga: 403120000},
+  {minggu: 'Minggu 4', totalHarga: 112310000},
 ];
 
 const DetailRekapitulasi = ({route}) => {
@@ -52,7 +52,7 @@ const DetailRekapitulasi = ({route}) => {
         <Image style={styles.headerImage} source={header} />
         <Image style={styles.headerlogo} source={logo} />
       </View>
-      <Text style={styles.title}>Grafik Rekapitulasi Menu</Text>
+      <Text style={styles.title}>Grafik Rekapitulasi Bayar</Text>
       <LineChart
         data={data}
         width={screenWidth}
@@ -65,7 +65,7 @@ const DetailRekapitulasi = ({route}) => {
             <ItemMenuTerjual
               key={item.minggu}
               minggu={item.minggu}
-              terjual={item.terjual}
+              totalHarga={item.totalHarga}
             />
           );
         })}

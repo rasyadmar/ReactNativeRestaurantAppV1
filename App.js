@@ -18,6 +18,7 @@ import RekapitulasiMenuPage from './src/pages/ManagementSection/RekapitulasiMenu
 import RekapitulasiPembayaranPage from './src/pages/ManagementSection/RekapitulasiPembayaranPage';
 import MainPageManagement from './src/pages/ManagementSection/MainPage';
 import DetailRekapitulasiMenu from './src/pages/ManagementSection/RekapitulasiMenuPage/DetailRekapitulasi';
+import DetailRekapitulasiBayar from './src/pages/ManagementSection/RekapitulasiPembayaranPage/DetailRekapitulasi';
 import {Provider} from 'react-redux';
 import store from './src/app/store';
 
@@ -85,6 +86,13 @@ const App = () => {
           <Stack.Screen
             name="DetailRekapitulasiMenu"
             component={DetailRekapitulasiMenu}
+            initialParams={{
+              bulan: 'none',
+            }}
+          />
+          <Stack.Screen
+            name="DetailRekapitulasiBayar"
+            component={DetailRekapitulasiBayar}
             initialParams={{
               bulan: 'none',
             }}

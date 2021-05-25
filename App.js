@@ -16,6 +16,7 @@ import DetailPelanggan from './src/pages/PelayanSection/DaftarPesananPage/detail
 import RatingPage from './src/pages/ManagementSection/RatingPage';
 import RekapitulasiMenuPage from './src/pages/ManagementSection/RekapitulasiMenuPage';
 import RekapitulasiPembayaranPage from './src/pages/ManagementSection/RekapitulasiPembayaranPage';
+import MainPageManagement from './src/pages/ManagementSection/MainPage';
 import {Provider} from 'react-redux';
 import store from './src/app/store';
 
@@ -67,13 +68,19 @@ const App = () => {
           /> */}
 
           {/* Halaman Management */}
-          {/* <Stack.Screen name="RatingPage" component={RatingPage}></Stack.Screen> */}
+          <Stack.Screen
+            name="MainPageManagement"
+            component={MainPageManagement}
+          />
+          <Stack.Screen name="RatingPage" component={RatingPage} />
           <Stack.Screen
             name="RekapitulasiMenuPage"
-            component={RekapitulasiMenuPage}></Stack.Screen>
+            component={RekapitulasiMenuPage}
+          />
           <Stack.Screen
             name="RekapitulasiPembayaranPage"
-            component={RekapitulasiPembayaranPage}></Stack.Screen>
+            component={RekapitulasiPembayaranPage}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

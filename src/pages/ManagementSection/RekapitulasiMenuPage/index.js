@@ -1,43 +1,88 @@
-import React from 'react';
-import {StyleSheet, Text, View, Dimensions} from 'react-native';
-import {LineChart} from 'react-native-chart-kit';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, Text, View, Image, ScrollView} from 'react-native';
+import {Rating, AirbnbRating} from 'react-native-ratings';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import header from '../../../assets/image/headerflip.jpeg';
+import logo from '../../../assets/image/img_logo.jpeg';
+import ItemBulanRekapitulasi from './itemBulanRekapitulasi';
 
-const RekapitulasiMenuPage = () => {
-  const screenWidth = Dimensions.get('window').width;
-  const data = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43, 100],
-        color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`, // optional
-        strokeWidth: 2, // optional
-      },
-    ],
-    legend: ['Rainy Days'], // optional
+let Bulan = [
+  'Januari 2021',
+  'Februari 2021',
+  'Maret 2021',
+  'April 2021',
+  'Mei 2021',
+  'Juni 2021',
+  'Juli 2021',
+  'Agustus 2021',
+  'September 2021',
+  'Oktober 2021',
+  'November 2021',
+  'Desember 2021',
+];
+
+const RekapitulasiMenuPage = ({navigation}) => {
+  const [bulan, setBulan] = useState([]);
+
+  useEffect(() => {
+    setBulan(Bulan);
+  }, []);
+
+  const toDetailRekapitulasi = bulan => {
+    navigation.navigate('DetailRekapitulasiMenu', {
+      bulan: bulan,
+    });
   };
-  const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientFromOpacity: 1,
-    backgroundGradientTo: '#fff',
-    backgroundGradientToOpacity: 1,
-    color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`,
-    strokeWidth: 2, // optional, default 3
-    barPercentage: 0.5,
-    useShadowColorFromDataset: false, // optional
-  };
+
   return (
-    <View>
-      <Text>ole</Text>
-      <LineChart
-        data={data}
-        width={screenWidth}
-        height={220}
-        chartConfig={chartConfig}
-      />
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Image style={styles.headerImage} source={header} />
+        <Image style={styles.headerlogo} source={logo} />
+      </View>
+      <Text style={styles.title}>Rekapitulasi Menu</Text>
+      <ScrollView>
+        {bulan.map(item => {
+          return (
+            <ItemBulanRekapitulasi
+              key={item}
+              bulan={item}
+              toDetailRekapitulasi={() => toDetailRekapitulasi(item)}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 };
 
 export default RekapitulasiMenuPage;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  headerImage: {
+    height: 100,
+    width: 215,
+  },
+  headerlogo: {
+    height: 100,
+    width: 150,
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: hp('3.5%'),
+    color: '#f39c12',
+    fontWeight: 'bold',
+    marginVertical: hp('1%'),
+  },
+});

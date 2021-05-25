@@ -17,6 +17,7 @@ import RatingPage from './src/pages/ManagementSection/RatingPage';
 import RekapitulasiMenuPage from './src/pages/ManagementSection/RekapitulasiMenuPage';
 import RekapitulasiPembayaranPage from './src/pages/ManagementSection/RekapitulasiPembayaranPage';
 import MainPageManagement from './src/pages/ManagementSection/MainPage';
+import DetailRekapitulasiMenu from './src/pages/ManagementSection/RekapitulasiMenuPage/DetailRekapitulasi';
 import {Provider} from 'react-redux';
 import store from './src/app/store';
 
@@ -63,7 +64,7 @@ const App = () => {
             name="DetailPelanggan"
             component={DetailPelanggan}
             initialParams={{
-              namaPelanggan: 'Blum Masok',
+              namaPelanggan: 'none',
             }}
           /> */}
 
@@ -80,6 +81,13 @@ const App = () => {
           <Stack.Screen
             name="RekapitulasiPembayaranPage"
             component={RekapitulasiPembayaranPage}
+          />
+          <Stack.Screen
+            name="DetailRekapitulasiMenu"
+            component={DetailRekapitulasiMenu}
+            initialParams={{
+              bulan: 'none',
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>

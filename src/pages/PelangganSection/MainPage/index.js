@@ -21,6 +21,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import firestore from '@react-native-firebase/firestore';
 
 let kodeRestoIn = 'Belum Ada Kode Restoran';
 let dataPemesan = {};
@@ -38,6 +39,26 @@ export const getPengguna = () => {
 };
 
 const MainPage = ({route, navigation}) => {
+  const run = async () => {
+    firestore()
+      .collection('Users')
+      .get()
+      .then(querySnapshot => {
+        console.log('Total users: ', querySnapshot.size);
+
+        querySnapshot.forEach(documentSnapshot => {
+          console.log(
+            'User ID: ',
+            documentSnapshot.id,
+            documentSnapshot.data(),
+          );
+        });
+      });
+  };
+
+  useEffect(() => {
+    run();
+  }, []);
   const {restoranCode} = route.params;
 
   const [atasNama, setAtasNama] = useState('');

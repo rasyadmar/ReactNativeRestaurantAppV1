@@ -1,39 +1,39 @@
-'use strict';
-
 import React, {Component} from 'react';
-import setNamaPengguna from '../MainPage';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-
+import {useEffect, useState} from 'react/cjs/react.development';
 import {
   AppRegistry,
   StyleSheet,
   Text,
   TouchableOpacity,
   Linking,
+  View,
 } from 'react-native';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
+import firestore from '@react-native-firebase/firestore';
 
 export default function QRScanPage({navigation}) {
   const onSuccess = e => {
-    // setNamaPengguna(e.data);
-    navigation.navigate('MainPelanggan', {
-      restoranCode: e.data,
-    });
+    if (e.data === 'nariwipelanggan') {
+      navigation.navigate('MainPelanggan', {
+        restoranCode: e.data,
+      });
+    } else if (e.data === 'nariwipelayan') {
+      navigation.navigate('MainPelayan');
+    } else if (e.data === 'nariwimanagement') {
+      navigation.navigate('MainPageManagement');
+    }
   };
 
   return (
     <QRCodeScanner
       onRead={onSuccess}
-      topContent={
-        <Text style={styles.centerText}>
-          Scan <Text style={styles.textBold}>Kode Restoran</Text>
-        </Text>
-      }
+      bottomContent={<Text style={styles.textBold}>Scan QrCode</Text>}
     />
   );
 }
@@ -46,11 +46,11 @@ const styles = StyleSheet.create({
     color: '#777',
   },
   textBold: {
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#000',
   },
   buttonText: {
-    fontSize: hp('21%'),
+    fontSize: hp('24%'),
     color: 'rgb(0,122,255)',
   },
   buttonTouchable: {

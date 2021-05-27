@@ -4,7 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import MainPagePelanggan from './src/pages/PelangganSection/MainPage';
 import KeranjangPagePelanggan from './src/pages/PelangganSection/KeranjangPage';
-import QRScanPage from './src/pages/PelangganSection/QRScanPage';
+import QRScanPage from './src/pages/QRScanPage';
 import MenuPagePelanggan from './src/pages/PelangganSection/MenuPage';
 import MakananPagePelanggan from './src/pages/PelangganSection/MakananPage';
 import MinumanPagePelanggan from './src/pages/PelangganSection/MinumanPage';
@@ -32,23 +32,32 @@ const App = () => {
           screenOptions={{
             headerShown: false,
           }}>
-          {/* <Stack.Screen name="QRscanner" component={QRScanPage} /> */}
+          <Stack.Screen name="QRscanner" component={QRScanPage} />
 
           {/* Halaman Pelanggan */}
-          {/* <Stack.Screen
+          <Stack.Screen
             name="MainPelanggan"
-            component={Mainp=PagePelanggan}
+            component={MainPagePelanggan}
             initialParams={{
               restoranCode: 'Scan QR Untuk Kode Restoran',
             }}
           />
-          <Stack.Screen name="KeranjangPelanggan" component={KeranjangPagePelanggan} />
+          <Stack.Screen
+            name="KeranjangPelanggan"
+            component={KeranjangPagePelanggan}
+          />
           <Stack.Screen name="MenuPelanggan" component={MenuPagePelanggan} />
-          <Stack.Screen name="MakananPelanggan" component={MakananPagePelanggan} />
-          <Stack.Screen name="MinumanPelanggan" component={MinumanPagePelanggan} /> */}
+          <Stack.Screen
+            name="MakananPelanggan"
+            component={MakananPagePelanggan}
+          />
+          <Stack.Screen
+            name="MinumanPelanggan"
+            component={MinumanPagePelanggan}
+          />
 
           {/* Halaman Pelanyan */}
-          {/* <Stack.Screen name="MainPelayan" component={MainPagePelayan} />
+          <Stack.Screen name="MainPelayan" component={MainPagePelayan} />
           <Stack.Screen
             name="DaftarPesananPelayan"
             component={DaftarPesananPelayan}
@@ -67,7 +76,7 @@ const App = () => {
             initialParams={{
               namaPelanggan: 'none',
             }}
-          /> */}
+          />
 
           {/* Halaman Management */}
           <Stack.Screen

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "798818656818",
+    "project_id": "tes2coba-59b0e",
+    "storage_bucket": "tes2coba-59b0e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798818656818:android:90d357bb10893dc7d3522b",
+        "android_client_info": {
+          "package_name": "com.restonarawi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "798818656818-t00munntudds39a3bami4198ip8gmbgs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.restonarawi",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "798818656818-ao230tp6991c364kh467vnulqurgnmsk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGy6Q8OXs1ZDcIM1oyeSpe_XmZV4UGQjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "798818656818-ao230tp6991c364kh467vnulqurgnmsk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

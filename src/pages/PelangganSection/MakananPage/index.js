@@ -38,7 +38,8 @@ const MakananPage = () => {
   };
 
   useEffect(() => {
-    getData();
+    console.log('asdef');
+    // getData();
     cekHarga(keranjang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

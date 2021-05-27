@@ -7,11 +7,32 @@ import {
 } from 'react-native-responsive-screen';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
+import ItemReview from './itemReview';
+
+let dummyReview = [
+  {id: 1, pereview: 'budi', review: 1},
+  {id: 2, pereview: 'maman', review: 2},
+  {id: 3, pereview: 'memet', review: 1},
+  {id: 4, pereview: 'amir', review: 5},
+  {id: 5, pereview: 'samir', review: 2},
+  {id: 6, pereview: 'lail', review: 5},
+  {id: 7, pereview: 'jono', review: 5},
+];
 
 const RatingPage = () => {
   const [rating, setRating] = useState(1);
+  const [dummy, setDummy] = useState([]);
+  const countRating = () => {
+    let dumRating = 0;
+    dummy.map(item => {
+      dumRating = dumRating + item.review;
+    });
+    setRating((dumRating / dummy.length).toFixed(1));
+  };
   useEffect(() => {
-    setRating(5);
+    countRating();
+    setDummy(dummyReview);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const ratingCompleted = rating => {
@@ -26,16 +47,27 @@ const RatingPage = () => {
       <Text style={styles.title}>Rating Pengguna</Text>
       <View style={styles.ratingContainer}>
         <Text style={styles.ratingText}>{rating}</Text>
-        <AirbnbRating
+        <Rating
           tintColor="white"
-          count={5}
+          ratingCount={6}
           showRating={false}
-          defaultRating={rating}
+          startingValue={rating}
           onFinishRating={ratingCompleted}
+          readonly={true}
           size={hp('5%')}
         />
       </View>
-      <ScrollView></ScrollView>
+      <ScrollView>
+        {dummy.map(item => {
+          return (
+            <ItemReview
+              key={item.id}
+              pereview={item.pereview}
+              review={item.review}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 };

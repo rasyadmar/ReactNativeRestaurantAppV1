@@ -11,6 +11,8 @@
     "emulator": "C:\\Users\\MAR\\AppData\\Local\\Android\\Sdk\\emulator\\emulator -avd Pixel_3a_API_30"
   },
   "dependencies": {
+    "@react-native-firebase/app": "^12.0.0",
+    "@react-native-firebase/firestore": "^12.0.0",
     "@react-navigation/native": "^6.0.0-next.2",
     "@react-navigation/stack": "^6.0.0-next.9",
     "@reduxjs/toolkit": "^1.5.1",

@@ -19,11 +19,14 @@ import logo from '../../../assets/image/img_logo.jpeg';
 import ItemBelanja from './ItemBelanja';
 import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
+import {selectPesanStatus} from '../../../features/statusPesanSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KeranjangPage = () => {
   const [list, setList] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
   const keranjang = useSelector(selectKeranjang);
+  const statusPesan = useSelector(selectPesanStatus);
 
   const cekHarga = items => {
     let harga = 0;
@@ -36,13 +39,9 @@ const KeranjangPage = () => {
   };
 
   useEffect(() => {
-    getList();
-    cekHarga(keranjang);
-  });
-
-  const getList = () => {
     setList(keranjang);
-  };
+    cekHarga(keranjang);
+  }, [keranjang]);
 
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -80,9 +79,6 @@ const KeranjangPage = () => {
           </Text>
         </Text>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.Btn}>
-            <Text style={styles.btnText}>Cek Harga</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.Btn}>
             <Text style={styles.btnText}>Pesan</Text>
           </TouchableOpacity>

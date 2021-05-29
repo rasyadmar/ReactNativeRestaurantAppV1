@@ -18,9 +18,12 @@ import {RNCamera} from 'react-native-camera';
 import firestore from '@react-native-firebase/firestore';
 import {AuthContext} from '../../../utils/authContext';
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 export default function QRScanPage({navigation}) {
-  const {toPelanggan, toPelayan, toManagement} = React.useContext(AuthContext);
+  const {toMainPelanggan, toPelayan, toManagement} = React.useContext(
+    AuthContext,
+  );
   // const {management} = React.useContext(AuthContext);
 
   const onSuccess = e => {
@@ -36,16 +39,16 @@ export default function QRScanPage({navigation}) {
 
         console.error(error);
       });
+    messaging()
+      .getToken()
+      .then(token => {
+        console.log('this is token: ', token);
+      });
     if (e.data === 'nariwipelanggan') {
-      // navigation.navigate('MainPelanggan', {
-      //   restoranCode: e.data,
-      // });
-      toPelanggan();
+      toMainPelanggan();
     } else if (e.data === 'nariwipelayan') {
-      // navigation.navigate('MainPelayan');
       toPelayan();
     } else if (e.data === 'nariwimanagement') {
-      // navigation.navigate('MainPageManagement');
       toManagement();
     }
   };

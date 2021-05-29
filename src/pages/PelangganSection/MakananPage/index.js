@@ -20,8 +20,11 @@ import axios from 'axios';
 import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MakananPage = () => {
+const KERANJANG = 'List Keranjang Presistence';
+
+const MakananPage = ({navigation}) => {
   const [list, setList] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
   const keranjang = useSelector(selectKeranjang);
@@ -44,16 +47,8 @@ const MakananPage = () => {
       .where('jenis', '==', 'makanan')
       .get()
       .then(querySnapshot => {
-        console.log('Total users: ', querySnapshot.size);
-
         querySnapshot.forEach(documentSnapshot => {
-          console.log(
-            'User ID: ',
-            documentSnapshot.id,
-            documentSnapshot.data(),
-          );
           listGet.push(documentSnapshot.data());
-          console.log(documentSnapshot.data().id);
         });
         setList(listGet);
       });
@@ -62,8 +57,7 @@ const MakananPage = () => {
     getFireData();
     // getData();
     cekHarga(keranjang);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [keranjang]);
 
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -109,9 +103,9 @@ const MakananPage = () => {
           <Text
             style={styles.btnText}
             onPress={() => {
-              cekHarga(keranjang);
+              navigation.navigate('KeranjangPelanggan');
             }}>
-            Cek Harga
+            Cek Keranjang
           </Text>
         </TouchableOpacity>
       </View>
@@ -162,7 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   Btn: {
-    width: wp('25%'),
+    width: wp('27%'),
     backgroundColor: '#f39c12',
     borderRadius: hp('4%'),
     height: hp('4.5%'),

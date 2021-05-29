@@ -22,47 +22,27 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import firestore from '@react-native-firebase/firestore';
-
-let kodeRestoIn = 'Belum Ada Kode Restoran';
-let dataPemesan = {};
-
-export const setKodeRestoIn = kode => {
-  kodeRestoIn = kode;
-};
-
-export const setPengguna = data => {
-  dataPemesan = data;
-};
-
-export const getPengguna = () => {
-  return dataPemesan;
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthContext} from '../../../../utils/authContext';
 
 const MainPage = ({route, navigation}) => {
-  const run = async () => {
-    firestore()
-      .collection('Users')
-      .get()
-      .then(querySnapshot => {
-        console.log('Total users: ', querySnapshot.size);
-
-        querySnapshot.forEach(documentSnapshot => {
-          console.log(
-            'User ID: ',
-            documentSnapshot.id,
-            documentSnapshot.data(),
-          );
-        });
-      });
-  };
-
-  useEffect(() => {
-    // run();
-  }, []);
-  const {restoranCode} = route.params;
-
+  useEffect(() => {}, []);
+  const {toPelanggan} = React.useContext(AuthContext);
   const [atasNama, setAtasNama] = useState('');
   const [nomorMeja, setNomorMeja] = useState('');
+  const run = () => {
+    if (atasNama === '' || nomorMeja === '') {
+      ToastAndroid.show(
+        'Nomor Meja, Nama Pemesan Harus di Isi',
+        ToastAndroid.LONG,
+      );
+    } else {
+      AsyncStorage.setItem('sekarang', 'udahregispelanggan');
+      AsyncStorage.setItem('namaPemesan', atasNama);
+      AsyncStorage.setItem('nomorMeja', nomorMeja);
+      toPelanggan();
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -86,33 +66,10 @@ const MainPage = ({route, navigation}) => {
       <TouchableOpacity
         style={styles.loginBtn}
         onPress={() => {
-          // if (
-          //   atasNama === '' ||
-          //   nomorMeja === '' ||
-          //   restoranCode === 'Scan QR Untuk Kode Restoran'
-          // ) {
-          //   ToastAndroid.show(
-          //     'QR, Nomor Meja, Nama Pemesan Harus di Isi',
-          //     ToastAndroid.LONG,
-          //   );
-          // } else {
-          //   setPengguna({
-          //     nama: atasNama,
-          //     nomor: nomorMeja,
-          //     restoran: restoranCode,
-          //   });
-          //   navigation.navigate('Menu', {
-          //     namaPemesan: atasNama,
-          //     nomorMeja: nomorMeja,
-          //   });
-          // }
-          navigation.navigate('MenuPelanggan');
+          run();
         }}>
         <Text style={{color: 'white', fontWeight: 'bold'}}>PESAN</Text>
       </TouchableOpacity>
-      <Text style={{color: '#7f8c8d', fontSize: 12}}>
-        Kode Resto: {restoranCode}
-      </Text>
     </View>
   );
 };

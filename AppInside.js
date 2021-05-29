@@ -7,6 +7,7 @@ import KeranjangPagePelanggan from './src/pages/PelangganSection/KeranjangPage';
 import QRScanPage from './src/pages/QRScanPage';
 import MenuPagePelanggan from './src/pages/PelangganSection/MenuPage';
 import MakananPagePelanggan from './src/pages/PelangganSection/MakananPage';
+import StatusPesananPelanggan from './src/pages/PelangganSection/StatusPesananPage';
 import MinumanPagePelanggan from './src/pages/PelangganSection/MinumanPage';
 import MainPagePelayan from './src/pages/PelayanSection/MainPage';
 import DaftarPesananPelayan from './src/pages/PelayanSection/DaftarPesananPage';
@@ -21,7 +22,6 @@ import DetailRekapitulasiMenu from './src/pages/ManagementSection/RekapitulasiMe
 import DetailRekapitulasiBayar from './src/pages/ManagementSection/RekapitulasiPembayaranPage/DetailRekapitulasi';
 import {AuthContext} from './utils/authContext';
 import {reducer, initialState} from './reducer';
-import {stateConditionString} from './utils/helpers';
 
 const Stack = createStackNavigator();
 
@@ -29,16 +29,23 @@ const AppInside = ({navigation}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     const bootstrapAsync = async () => {
-      let userToken;
+      let sekarang;
+      let namaPemesan;
 
       try {
-        // userToken = await AsyncStorage.getItem('userToken');
+        sekarang = await AsyncStorage.getItem('sekarang');
+        namaPemesan = await AsyncStorage.getItem('namaPemesan');
       } catch (e) {}
 
-      dispatch({type: 'RESTORE_TOKEN'});
+      if (sekarang === 'udahregispelanggan') {
+        dispatch({type: 'TO_PELANGGAN'});
+      }
+      if (sekarang === 'belum') {
+        dispatch({type: 'TO_QRSCAN'});
+      } else {
+      }
     };
     bootstrapAsync();
-    console.log(state);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -46,6 +53,9 @@ const AppInside = ({navigation}) => {
     () => ({
       toPelanggan: async data => {
         dispatch({type: 'TO_PELANGGAN'});
+      },
+      toMainPelanggan: async data => {
+        dispatch({type: 'TO_MAIN_PELANGGAN'});
       },
       toPelayan: async data => {
         dispatch({type: 'TO_PELAYAN'});
@@ -74,24 +84,25 @@ const AppInside = ({navigation}) => {
     if (state.toManagement) {
       le = 'MANAGEMENT';
     }
+    if (state.toMainPelanggan) {
+      le = 'MAINPELANGGAN';
+    }
     let arr = [];
 
     switch (le) {
+      case 'MAINPELANGGAN':
+        arr.push(
+          <Stack.Screen name="MainPelanggan" component={MainPagePelanggan} />,
+        );
+        break;
       case 'PELANGGAN':
         arr.push(
           <>
-            <Stack.Screen
-              name="MainPelanggan"
-              component={MainPagePelanggan}
-              initialParams={{
-                restoranCode: 'Scan QR Untuk Kode Restoran',
-              }}
-            />
+            <Stack.Screen name="MenuPelanggan" component={MenuPagePelanggan} />
             <Stack.Screen
               name="KeranjangPelanggan"
               component={KeranjangPagePelanggan}
             />
-            <Stack.Screen name="MenuPelanggan" component={MenuPagePelanggan} />
             <Stack.Screen
               name="MakananPelanggan"
               component={MakananPagePelanggan}
@@ -100,10 +111,13 @@ const AppInside = ({navigation}) => {
               name="MinumanPelanggan"
               component={MinumanPagePelanggan}
             />
+            <Stack.Screen
+              name="StatusPesananPelanggan"
+              component={StatusPesananPelanggan}
+            />
           </>,
         );
         break;
-
       case 'PELAYAN':
         arr.push(
           <>

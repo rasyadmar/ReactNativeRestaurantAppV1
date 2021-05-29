@@ -34,16 +34,13 @@ export default function MenuPage({route, navigation}) {
         }}>
         <Text style={styles.btnText}>Minuman</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.Btn}
         onPress={() => {
-          // navigation.navigate('Keranjang', {
-          //   namaPemesan: namaPemesan,
-          //   nomorMeja: nomorMeja,
-          // });
-          navigation.navigate('KeranjangPelanggan');
+          navigation.navigate('StatusPesananPelanggan');
         }}>
-        <Text style={styles.btnText}>Keranjang</Text>
+        <Text style={styles.btnText}>Status Pesanan</Text>
       </TouchableOpacity>
     </View>
   );

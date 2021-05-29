@@ -21,93 +21,14 @@ import DetailRekapitulasiMenu from './src/pages/ManagementSection/RekapitulasiMe
 import DetailRekapitulasiBayar from './src/pages/ManagementSection/RekapitulasiPembayaranPage/DetailRekapitulasi';
 import {Provider} from 'react-redux';
 import store from './src/app/store';
+import AppInside from './AppInside';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}>
-          <Stack.Screen name="QRscanner" component={QRScanPage} />
-
-          {/* Halaman Pelanggan */}
-          <Stack.Screen
-            name="MainPelanggan"
-            component={MainPagePelanggan}
-            initialParams={{
-              restoranCode: 'Scan QR Untuk Kode Restoran',
-            }}
-          />
-          <Stack.Screen
-            name="KeranjangPelanggan"
-            component={KeranjangPagePelanggan}
-          />
-          <Stack.Screen name="MenuPelanggan" component={MenuPagePelanggan} />
-          <Stack.Screen
-            name="MakananPelanggan"
-            component={MakananPagePelanggan}
-          />
-          <Stack.Screen
-            name="MinumanPelanggan"
-            component={MinumanPagePelanggan}
-          />
-
-          {/* Halaman Pelanyan */}
-          <Stack.Screen name="MainPelayan" component={MainPagePelayan} />
-          <Stack.Screen
-            name="DaftarPesananPelayan"
-            component={DaftarPesananPelayan}
-          />
-          <Stack.Screen
-            name="UpdateStokPelayan"
-            component={UpdateStokPelayan}
-          />
-          <Stack.Screen
-            name="ChatPelangganPelayan"
-            component={ChatPelangganPelayan}
-          />
-          <Stack.Screen
-            name="DetailPelanggan"
-            component={DetailPelanggan}
-            initialParams={{
-              namaPelanggan: 'none',
-            }}
-          />
-
-          {/* Halaman Management */}
-          <Stack.Screen
-            name="MainPageManagement"
-            component={MainPageManagement}
-          />
-          <Stack.Screen name="RatingPage" component={RatingPage} />
-          <Stack.Screen
-            name="RekapitulasiMenuPage"
-            component={RekapitulasiMenuPage}
-          />
-          <Stack.Screen
-            name="RekapitulasiPembayaranPage"
-            component={RekapitulasiPembayaranPage}
-          />
-          <Stack.Screen
-            name="DetailRekapitulasiMenu"
-            component={DetailRekapitulasiMenu}
-            initialParams={{
-              bulan: 'none',
-            }}
-          />
-          <Stack.Screen
-            name="DetailRekapitulasiBayar"
-            component={DetailRekapitulasiBayar}
-            initialParams={{
-              bulan: 'none',
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <AppInside />
     </Provider>
   );
 };

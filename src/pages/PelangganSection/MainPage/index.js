@@ -57,7 +57,7 @@ const MainPage = ({route, navigation}) => {
   };
 
   useEffect(() => {
-    run();
+    // run();
   }, []);
   const {restoranCode} = route.params;
 

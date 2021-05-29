@@ -16,17 +16,37 @@ import {
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 import firestore from '@react-native-firebase/firestore';
+import {AuthContext} from '../../../utils/authContext';
+import auth from '@react-native-firebase/auth';
 
 export default function QRScanPage({navigation}) {
+  const {toPelanggan, toPelayan, toManagement} = React.useContext(AuthContext);
+  // const {management} = React.useContext(AuthContext);
+
   const onSuccess = e => {
-    if (e.data === 'nariwipelanggan') {
-      navigation.navigate('MainPelanggan', {
-        restoranCode: e.data,
+    auth()
+      .signInAnonymously()
+      .then(() => {
+        console.log('User signed in anonymously');
+      })
+      .catch(error => {
+        if (error.code === 'auth/operation-not-allowed') {
+          console.log('Enable anonymous in your firebase console.');
+        }
+
+        console.error(error);
       });
+    if (e.data === 'nariwipelanggan') {
+      // navigation.navigate('MainPelanggan', {
+      //   restoranCode: e.data,
+      // });
+      toPelanggan();
     } else if (e.data === 'nariwipelayan') {
-      navigation.navigate('MainPelayan');
+      // navigation.navigate('MainPelayan');
+      toPelayan();
     } else if (e.data === 'nariwimanagement') {
-      navigation.navigate('MainPageManagement');
+      // navigation.navigate('MainPageManagement');
+      toManagement();
     }
   };
 

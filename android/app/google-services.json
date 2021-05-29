@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "798818656818",
-    "project_id": "tes2coba-59b0e",
-    "storage_bucket": "tes2coba-59b0e.appspot.com"
+    "project_number": "605091788391",
+    "project_id": "restonariwi-b8c97",
+    "storage_bucket": "restonariwi-b8c97.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:798818656818:android:90d357bb10893dc7d3522b",
+        "mobilesdk_app_id": "1:605091788391:android:5f379bade7c34d3efb86c2",
         "android_client_info": {
           "package_name": "com.restonarawi"
         }
       },
       "oauth_client": [
         {
-          "client_id": "798818656818-t00munntudds39a3bami4198ip8gmbgs.apps.googleusercontent.com",
+          "client_id": "605091788391-vrr73nc3sgmu0du2j102diicl9umb2e6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.restonarawi",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+            "certificate_hash": "a735a0aa8dc80852d31c46827a2a4b997e869ea9"
           }
         },
         {
-          "client_id": "798818656818-ao230tp6991c364kh467vnulqurgnmsk.apps.googleusercontent.com",
+          "client_id": "605091788391-7i6c6o624rnlctfuvioc2b0j5btu25j0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDGy6Q8OXs1ZDcIM1oyeSpe_XmZV4UGQjI"
+          "current_key": "AIzaSyBBRvqbR3tssxGJxbfcrHLKbNnl1x6cbxc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "798818656818-ao230tp6991c364kh467vnulqurgnmsk.apps.googleusercontent.com",
+              "client_id": "605091788391-7i6c6o624rnlctfuvioc2b0j5btu25j0.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

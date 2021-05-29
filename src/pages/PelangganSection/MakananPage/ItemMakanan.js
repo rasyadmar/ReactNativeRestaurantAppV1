@@ -48,7 +48,6 @@ export default function ItemBelanja({
         dispatch(
           addToKeranjang({
             data: {
-              id: idItemDiDB,
               nama: namaItem,
               harga: hargaItem,
               qty: 1,

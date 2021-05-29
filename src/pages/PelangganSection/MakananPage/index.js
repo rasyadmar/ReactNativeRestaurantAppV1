@@ -19,6 +19,7 @@ import ItemMakanan from './ItemMakanan';
 import axios from 'axios';
 import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
+import firestore from '@react-native-firebase/firestore';
 
 const MakananPage = () => {
   const [list, setList] = useState([]);
@@ -36,9 +37,29 @@ const MakananPage = () => {
     }
     setTotalHarga(harga);
   };
+  const getFireData = () => {
+    let listGet = [];
+    firestore()
+      .collection('menu')
+      .where('jenis', '==', 'makanan')
+      .get()
+      .then(querySnapshot => {
+        console.log('Total users: ', querySnapshot.size);
 
+        querySnapshot.forEach(documentSnapshot => {
+          console.log(
+            'User ID: ',
+            documentSnapshot.id,
+            documentSnapshot.data(),
+          );
+          listGet.push(documentSnapshot.data());
+          console.log(documentSnapshot.data().id);
+        });
+        setList(listGet);
+      });
+  };
   useEffect(() => {
-    console.log('asdef');
+    getFireData();
     // getData();
     cekHarga(keranjang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,10 +85,9 @@ const MakananPage = () => {
         {list.map((item, i) => {
           return (
             <ItemMakanan
-              key={item.id}
-              idItemDiDB={item.id}
-              namaItem={item.item}
-              jumlahItem={item.jumlah}
+              key={item.nama}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
               hargaItem={item.harga}
             />
           );

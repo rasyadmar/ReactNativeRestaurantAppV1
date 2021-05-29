@@ -16,13 +16,7 @@ import {
 import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
 
-export default function ItemBelanja({
-  idItemDiDB,
-  namaItem,
-  stok,
-  jumlahItem,
-  hargaItem,
-}) {
+export default function ItemBelanja({namaItem, stok, jumlahItem, hargaItem}) {
   const dispatch = useDispatch();
   const keranjang = useSelector(selectKeranjang);
   const [qty, setQty] = useState(0);
@@ -50,7 +44,6 @@ export default function ItemBelanja({
         dispatch(
           addToKeranjang({
             data: {
-              id: idItemDiDB,
               nama: namaItem,
               harga: hargaItem,
               qty: 1,
@@ -127,8 +120,8 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   itemName: {
-    fontSize: hp('2.5%'),
-    height: hp('5%'),
+    fontSize: hp('2%'),
+    height: hp('4%'),
     color: '#7f8c8d',
     fontWeight: 'bold',
     fontFamily: 'monospace',

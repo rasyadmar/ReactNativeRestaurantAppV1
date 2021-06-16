@@ -12,19 +12,23 @@ import {
   Linking,
   View,
 } from 'react-native';
-
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 import firestore from '@react-native-firebase/firestore';
 import {AuthContext} from '../../../utils/authContext';
 import auth from '@react-native-firebase/auth';
 import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function QRScanPage({navigation}) {
   const {toMainPelanggan, toPelayan, toManagement} = React.useContext(
     AuthContext,
   );
   // const {management} = React.useContext(AuthContext);
+
+  useEffect(() => {
+    AsyncStorage.setItem('statusPesan', 'belum');
+  }, []);
 
   const onSuccess = e => {
     auth()
@@ -46,6 +50,7 @@ export default function QRScanPage({navigation}) {
       });
     if (e.data === 'nariwipelanggan') {
       toMainPelanggan();
+      console.log('asd');
     } else if (e.data === 'nariwipelayan') {
       toPelayan();
     } else if (e.data === 'nariwimanagement') {

@@ -12,7 +12,7 @@ const itemReview = ({pereview, review}) => {
       <Text style={styles.text}>{pereview}</Text>
       <AirbnbRating
         tintColor="white"
-        count={6}
+        count={5}
         showRating={false}
         defaultRating={review}
         isDisabled={true}

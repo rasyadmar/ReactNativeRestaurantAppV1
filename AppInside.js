@@ -9,6 +9,8 @@ import MenuPagePelanggan from './src/pages/PelangganSection/MenuPage';
 import MakananPagePelanggan from './src/pages/PelangganSection/MakananPage';
 import StatusPesananPelanggan from './src/pages/PelangganSection/StatusPesananPage';
 import MinumanPagePelanggan from './src/pages/PelangganSection/MinumanPage';
+import GiveReviewPage from './src/pages/PelangganSection/GiveReviewPage';
+import NotificationPage from './src/pages/PelangganSection/NotificationPage';
 import MainPagePelayan from './src/pages/PelayanSection/MainPage';
 import DaftarPesananPelayan from './src/pages/PelayanSection/DaftarPesananPage';
 import UpdateStokPelayan from './src/pages/PelayanSection/UpdateStokPage';
@@ -30,19 +32,15 @@ const AppInside = ({navigation}) => {
   useEffect(() => {
     const bootstrapAsync = async () => {
       let sekarang;
-      let namaPemesan;
-
+      let nama;
+      let nomeja;
       try {
         sekarang = await AsyncStorage.getItem('sekarang');
-        namaPemesan = await AsyncStorage.getItem('namaPemesan');
+        nama = await AsyncStorage.getItem('namaPemesan');
+        nomeja = await AsyncStorage.getItem('nomorMeja');
       } catch (e) {}
-
       if (sekarang === 'udahregispelanggan') {
         dispatch({type: 'TO_PELANGGAN'});
-      }
-      if (sekarang === 'belum') {
-        dispatch({type: 'TO_QRSCAN'});
-      } else {
       }
     };
     bootstrapAsync();
@@ -114,6 +112,11 @@ const AppInside = ({navigation}) => {
             <Stack.Screen
               name="StatusPesananPelanggan"
               component={StatusPesananPelanggan}
+            />
+            <Stack.Screen name="GiveReviewPage" component={GiveReviewPage} />
+            <Stack.Screen
+              name="NotificationPage"
+              component={NotificationPage}
             />
           </>,
         );

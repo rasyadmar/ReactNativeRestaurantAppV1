@@ -22,12 +22,15 @@ import {selectKeranjang} from '../../../features/keranjangSlice';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const KERANJANG = 'List Keranjang Presistence';
-
 const MakananPage = ({navigation}) => {
   const [list, setList] = useState([]);
+  const [idItem, setIdItem] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
+  const [statusPesan, setStatusPesan] = useState('');
   const keranjang = useSelector(selectKeranjang);
+  const [namaPemesan, setNamaPemesan] = useState('');
+  const [noMeja, setNoMeja] = useState('');
+  const [once, setOnce] = useState(0);
 
   const cekHarga = items => {
     let harga = 0;
@@ -40,8 +43,10 @@ const MakananPage = ({navigation}) => {
     }
     setTotalHarga(harga);
   };
+
   const getFireData = () => {
     let listGet = [];
+    let listId = [];
     firestore()
       .collection('menu')
       .where('jenis', '==', 'makanan')
@@ -49,14 +54,51 @@ const MakananPage = ({navigation}) => {
       .then(querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           listGet.push(documentSnapshot.data());
+          listId.push(documentSnapshot.id);
         });
         setList(listGet);
+        setIdItem(listId);
       });
   };
+
+  const getStatus = () => {
+    firestore()
+      .collection('pesanan')
+      .where('meja', '==', noMeja)
+      .where('pemesan', '==', namaPemesan)
+      .get()
+      .then(querySnapshot => {
+        console.log(querySnapshot.size);
+        console.log('ini');
+        if (querySnapshot.size === 0) {
+          setStatusPesan('belum');
+        } else {
+          setStatusPesan('sudah');
+        }
+        console.log(statusPesan);
+      });
+  };
+
   useEffect(() => {
-    getFireData();
-    // getData();
+    if (once === 0) {
+      const bootstrapAsync = async () => {
+        let nama;
+        let nomeja;
+        try {
+          nama = await AsyncStorage.getItem('namaPemesan');
+          nomeja = await AsyncStorage.getItem('nomorMeja');
+        } catch (e) {}
+        setNamaPemesan(nama);
+        setNoMeja(nomeja);
+      };
+      getFireData();
+      cekHarga(keranjang);
+      getStatus();
+      bootstrapAsync();
+      setOnce(1);
+    }
     cekHarga(keranjang);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keranjang]);
 
   const currencyFormat = num => {
@@ -79,10 +121,13 @@ const MakananPage = ({navigation}) => {
         {list.map((item, i) => {
           return (
             <ItemMakanan
-              key={item.nama}
+              key={idItem[i]}
+              idItemDiDB={idItem[i]}
               namaItem={item.nama}
               jumlahItem={item.stok}
               hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
             />
           );
         })}
@@ -99,15 +144,22 @@ const MakananPage = ({navigation}) => {
             {currencyFormat(totalHarga)}
           </Text>
         </Text>
-        <TouchableOpacity style={styles.Btn}>
-          <Text
-            style={styles.btnText}
-            onPress={() => {
-              navigation.navigate('KeranjangPelanggan');
-            }}>
-            Cek Keranjang
+        {statusPesan === 'belum' && (
+          <TouchableOpacity style={styles.Btn}>
+            <Text
+              style={styles.btnText}
+              onPress={() => {
+                navigation.navigate('KeranjangPelanggan');
+              }}>
+              Cek Keranjang
+            </Text>
+          </TouchableOpacity>
+        )}
+        {statusPesan === 'sudah' && (
+          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>
+            Sudah Memesan
           </Text>
-        </TouchableOpacity>
+        )}
       </View>
     </View>
   );

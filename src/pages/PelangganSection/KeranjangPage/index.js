@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {
+  Alert,
   Image,
   StyleSheet,
   Text,
@@ -21,12 +22,18 @@ import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
 import {selectPesanStatus} from '../../../features/statusPesanSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 
-const KeranjangPage = () => {
+const KERANJANG = 'List Keranjang Presistence';
+
+const KeranjangPage = ({navigation}) => {
   const [list, setList] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
-  const keranjang = useSelector(selectKeranjang);
-  const statusPesan = useSelector(selectPesanStatus);
+  const [namaPemesa, setNamaPemesan] = useState('');
+  const [noMeja, setNoMeja] = useState('');
+  const [token, setToken] = useState('');
+  let keranjang = useSelector(selectKeranjang);
 
   const cekHarga = items => {
     let harga = 0;
@@ -39,8 +46,24 @@ const KeranjangPage = () => {
   };
 
   useEffect(() => {
+    const bootstrapAsync = async () => {
+      let nama;
+      let nomeja;
+      try {
+        nama = await AsyncStorage.getItem('namaPemesan');
+        nomeja = await AsyncStorage.getItem('nomorMeja');
+      } catch (e) {}
+      setNamaPemesan(nama);
+      setNoMeja(nomeja);
+    };
     setList(keranjang);
     cekHarga(keranjang);
+    bootstrapAsync();
+    messaging()
+      .getToken()
+      .then(token => {
+        setToken(token);
+      });
   }, [keranjang]);
 
   const currencyFormat = num => {
@@ -58,10 +81,11 @@ const KeranjangPage = () => {
         {list.map(item => {
           return (
             <ItemBelanja
-              key={item.id}
+              key={item.nama}
               namaItem={item.nama}
               jumlahItem={item.stok}
               hargaItem={item.harga}
+              linkGambar={item.linkGambar}
             />
           );
         })}
@@ -80,7 +104,64 @@ const KeranjangPage = () => {
         </Text>
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity style={styles.Btn}>
-            <Text style={styles.btnText}>Pesan</Text>
+            <Text
+              style={styles.btnText}
+              onPress={() => {
+                Alert.alert(
+                  'Peringatan',
+                  'Saat Pesanan Sudah Diproses, Pesanan Tidak Bisa di Batalkan.\nYakin Ingin Melanjutkan?',
+                  [
+                    {text: 'Tidak', onPress: () => {}},
+                    {
+                      text: 'Ya',
+                      onPress: () => {
+                        let pesanan = [];
+                        list.map(item => {
+                          pesanan.push({
+                            jumlah: item.qty,
+                            linkGambar: item.linkGambar,
+                            namaPesanan: item.nama,
+                            totalHarga: item.harga * item.qty,
+                          });
+                          firestore()
+                            .collection('menu')
+                            .doc(item.id)
+                            .get()
+                            .then(documentSnapshot => {
+                              if (documentSnapshot.exists) {
+                                firestore()
+                                  .collection('menu')
+                                  .doc(item.id)
+                                  .update({
+                                    stok:
+                                      documentSnapshot.data().stok - item.qty,
+                                  })
+                                  .then(() => {
+                                    console.log('stok is updated!');
+                                  });
+                              }
+                            });
+                        });
+                        firestore()
+                          .collection('pesanan')
+                          .add({
+                            pemesan: namaPemesa,
+                            meja: noMeja,
+                            pesanan: pesanan,
+                            progress: 'Belum Di Proses',
+                            totalHarga: totalHarga,
+                            token: token,
+                          })
+                          .then(() => {
+                            navigation.navigate('MenuPelanggan');
+                          });
+                      },
+                    },
+                  ],
+                );
+              }}>
+              Pesan
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

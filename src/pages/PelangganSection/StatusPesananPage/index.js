@@ -18,31 +18,67 @@ import firestore from '@react-native-firebase/firestore';
 import ItemBelanja from './ItemBelanja';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const StatusPesananPage = () => {
+const StatusPesananPage = ({navigation}) => {
   const [list, setList] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
   const [progress, setProgress] = useState('');
-  const getFireData = () => {
-    let nama = AsyncStorage.getItem('namaPemesan');
-    let nomorMeja = AsyncStorage.getItem('nomorMeja');
+  const [namaPemesan, setNamaPemesan] = useState('');
+  const [noMeja, setNoMeja] = useState('');
+  const [docName, setDocName] = useState('');
+  const deleteFireData = () => {
+    console.log(docName);
     firestore()
       .collection('pesanan')
-      .where('meja', '==', nomorMeja)
-      .where('pemesan', '==', nama)
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(documentSnapshot => {
-          setList(documentSnapshot.data().pesanan);
-          setTotalHarga(documentSnapshot.data().totalHarga);
-          setProgress(documentSnapshot.data().progress);
-        });
+      .doc(docName)
+      .delete()
+      .then(() => {
+        AsyncStorage.setItem('statusPesan', 'belum');
+        navigation.navigate('MenuPelanggan');
       });
-    console.log(list.length);
+  };
+  const changeProgress = () => {
+    firestore()
+      .collection('pesanan')
+      .doc(docName)
+      .update({
+        progress: 'Bayar',
+      })
+      .then(() => {
+        console.log('progress is updated!');
+        navigation.navigate('GiveReviewPage');
+      });
   };
   useEffect(() => {
-    getFireData();
+    const bootstrapAsync = async () => {
+      let nama;
+      let nomeja;
+      try {
+        nama = await AsyncStorage.getItem('namaPemesan');
+        nomeja = await AsyncStorage.getItem('nomorMeja');
+      } catch (e) {
+      } finally {
+        setNamaPemesan(nama);
+        setNoMeja(nomeja);
+        firestore()
+          .collection('pesanan')
+          .where('meja', '==', nomeja)
+          .where('pemesan', '==', nama)
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(documentSnapshot => {
+              setList(documentSnapshot.data().pesanan);
+              setDocName(documentSnapshot.id);
+              setTotalHarga(documentSnapshot.data().totalHarga);
+              setProgress(documentSnapshot.data().progress);
+            });
+          });
+      }
+    };
+    // getStorage();
+    bootstrapAsync();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [list]);
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
@@ -69,13 +105,13 @@ const StatusPesananPage = () => {
       {list.length !== 0 && (
         <ScrollView vertical>
           {list.map(item => {
-            console.log(item);
             return (
               <ItemBelanja
-                key={item.id}
+                key={item.namaPemesan}
                 namaItem={item.namaPesanan}
                 jumlahItem={item.jumlah}
                 hargaItem={item.totalHarga}
+                linkGambar={item.linkGambar}
               />
             );
           })}
@@ -97,37 +133,46 @@ const StatusPesananPage = () => {
         <View style={{flexDirection: 'column', alignItems: 'center'}}>
           {progress === 'Belum Di Proses' && (
             <>
-              <Text style={{color: '#7f8c8d', fontSize: hp('1.1%')}}>
-                Tekan Untuk Refresh:
+              <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
+                Tekan Untuk Batalkan:
               </Text>
               <TouchableOpacity
                 style={styles.BtnNotProcessed}
-                onPress={getFireData()}>
+                onPress={() => {
+                  deleteFireData();
+                }}>
                 <Text style={styles.btnText}>Belum Di Proses</Text>
               </TouchableOpacity>
             </>
           )}
           {progress === 'Sedang Di Proses' && (
             <>
-              <Text style={{color: '#7f8c8d', fontSize: hp('1.1%')}}>
-                Tekan Untuk Refresh:
-              </Text>
-              <TouchableOpacity
-                style={styles.BtnProcessed}
-                onPress={getFireData()}>
+              <TouchableOpacity style={styles.BtnProcessed}>
                 <Text style={styles.btnText}>Sedang Di Proses</Text>
               </TouchableOpacity>
             </>
           )}
           {progress === 'Sedang Di Antar' && (
             <>
-              <Text style={{color: '#7f8c8d', fontSize: hp('1.1%')}}>
-                Tekan Untuk Selesai:
+              <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
+                Tekan Sudah Diantar Selesai:
               </Text>
               <TouchableOpacity
                 style={styles.BtnDelivered}
-                onPress={getFireData()}>
+                onPress={() => {
+                  changeProgress();
+                }}>
                 <Text style={styles.btnText}>Diantar</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          {progress === 'Bayar' && (
+            <>
+              <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
+                Silakan Bayar Ke Kasir:
+              </Text>
+              <TouchableOpacity style={styles.BtnDelivered}>
+                <Text style={styles.btnText}>Bayar</Text>
               </TouchableOpacity>
             </>
           )}

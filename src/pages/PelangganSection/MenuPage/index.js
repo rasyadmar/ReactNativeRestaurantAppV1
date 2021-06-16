@@ -13,10 +13,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {useEffect} from 'react/cjs/react.development';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthContext} from '../../../../utils/authContext';
+import auth from '@react-native-firebase/auth';
 
 export default function MenuPage({route, navigation}) {
-  // const {namaPemesan, nomorMeja} = route.params;
-
+  const {toQrScan} = React.useContext(AuthContext);
   return (
     <View style={styles.container}>
       <Image source={logo} style={styles.logo} />
@@ -42,6 +44,43 @@ export default function MenuPage({route, navigation}) {
         }}>
         <Text style={styles.btnText}>Status Pesanan</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.Btn}
+        onPress={() => {
+          navigation.navigate('GiveReviewPage');
+        }}>
+        <Text style={styles.btnText}>Review Restoran</Text>
+      </TouchableOpacity>
+
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.BtnFooter}
+          onPress={() => {
+            AsyncStorage.setItem('sekarang', 'belumregis');
+            AsyncStorage.setItem('namaPemesan', '');
+            AsyncStorage.setItem('nomorMeja', '');
+            toQrScan();
+          }}>
+          <Text
+            style={styles.btnTextFooter}
+            onPress={() => {
+              try {
+                auth()
+                  .signOut()
+                  .then(() => console.log('User signed out!'));
+              } catch (e) {}
+            }}>
+            Log Out
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.BtnNotif}
+          onPress={() => {
+            navigation.navigate('NotificationPage');
+          }}>
+          <Text style={styles.btnTextNotif}>NOTIF</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -60,10 +99,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   Btn: {
-    width: wp('80%'),
+    width: wp('75%'),
     backgroundColor: '#f39c12',
     borderRadius: hp('4%'),
-    height: hp('7%'),
+    height: hp('6%'),
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: hp('5%'),
@@ -72,6 +111,40 @@ const styles = StyleSheet.create({
   btnText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: hp('2.5%'),
+    fontSize: hp('2%'),
+  },
+  footer: {
+    width: wp('80%'),
+    flexDirection: 'row-reverse',
+    padding: wp('3%'),
+    justifyContent: 'space-between',
+  },
+  BtnFooter: {
+    width: wp('19%'),
+    backgroundColor: '#f39c12',
+    borderRadius: hp('4%'),
+    height: hp('4.5%'),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: hp('0.5%'),
+  },
+  btnTextFooter: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: hp('1.8%'),
+  },
+  BtnNotif: {
+    width: wp('10%'),
+    backgroundColor: '#f39c12',
+    borderRadius: hp('7%'),
+    height: hp('4.5%'),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: hp('0.5%'),
+  },
+  btnTextNotif: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: hp('1.3%'),
   },
 });

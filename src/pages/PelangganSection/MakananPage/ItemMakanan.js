@@ -15,29 +15,44 @@ import {
 } from '../../../features/keranjangSlice';
 import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
+import storage from '@react-native-firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ItemBelanja({
   idItemDiDB,
   namaItem,
   jumlahItem,
   hargaItem,
+  linkGambar,
+  statusPes,
 }) {
   const dispatch = useDispatch();
   const keranjang = useSelector(selectKeranjang);
   const [qty, setQty] = useState(0);
+  const [urlGambar, setUrlGambar] = useState('');
+  const [statusPesan, setStatusPesan] = useState('');
+
   const checkKeranjang = () => {
     if (keranjang.length) {
       keranjang.map(item => {
         if (item.nama === namaItem) {
           setQty(item.qty);
+        } else {
+          setQty(0);
         }
       });
     }
   };
   useEffect(() => {
     checkKeranjang();
+    const bootstrapAsync = async () => {
+      const url = await storage().ref(linkGambar).getDownloadURL();
+      // console.log(linkGambar);
+      setUrlGambar(url);
+    };
+    bootstrapAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [keranjang]);
 
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -48,11 +63,13 @@ export default function ItemBelanja({
         dispatch(
           addToKeranjang({
             data: {
+              id: idItemDiDB,
               nama: namaItem,
               harga: hargaItem,
               qty: 1,
               stok: jumlahItem,
               tipe: 'makanan',
+              linkGambar: linkGambar,
             },
             id: Date.now(),
           }),
@@ -86,7 +103,8 @@ export default function ItemBelanja({
     <View style={styles.itemContainer}>
       <Image
         source={{
-          uri: `https://icotar.com/avatar/${namaItem}.png`,
+          // uri: `https://icotar.com/avatar/${namaItem}.png`,
+          uri: urlGambar,
         }}
         style={styles.itemImage}
       />
@@ -99,14 +117,18 @@ export default function ItemBelanja({
       </View>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
-            <Text style={styles.btnText}>+</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.BtnPlusMin}
-            onPress={() => substract()}>
-            <Text style={styles.btnText}>-</Text>
-          </TouchableOpacity>
+          {statusPes === 'belum' && (
+            <>
+              <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
+                <Text style={styles.btnText}>+</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.BtnPlusMin}
+                onPress={() => substract()}>
+                <Text style={styles.btnText}>-</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
         <Text style={styles.QtyText}>{qty}</Text>
       </View>
@@ -124,8 +146,8 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   itemName: {
-    fontSize: hp('2.5%'),
-    height: hp('5%'),
+    fontSize: hp('2.3%'),
+    height: hp('6.5%'),
     color: '#7f8c8d',
     fontWeight: 'bold',
     fontFamily: 'monospace',

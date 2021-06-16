@@ -20,32 +20,17 @@ import axios from 'axios';
 import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MinumanPage = () => {
+const MinumanPage = ({navigation}) => {
   const [list, setList] = useState([]);
+  const [idItem, setIdItem] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
+  const [statusPesan, setStatusPesan] = useState('');
   const keranjang = useSelector(selectKeranjang);
-
-  const getFireData = () => {
-    let listGet = [];
-    firestore()
-      .collection('menu')
-      .where('jenis', '==', 'minuman')
-      .get()
-      .then(querySnapshot => {
-        console.log('Total users: ', querySnapshot.size);
-
-        querySnapshot.forEach(documentSnapshot => {
-          console.log(
-            'User ID: ',
-            documentSnapshot.id,
-            documentSnapshot.data(),
-          );
-          listGet.push(documentSnapshot.data());
-        });
-        setList(listGet);
-      });
-  };
+  const [namaPemesan, setNamaPemesan] = useState('');
+  const [noMeja, setNoMeja] = useState('');
+  const [once, setOnce] = useState(0);
 
   const cekHarga = items => {
     let harga = 0;
@@ -59,18 +44,69 @@ const MinumanPage = () => {
     setTotalHarga(harga);
   };
 
+  const getFireData = () => {
+    let listGet = [];
+    let listId = [];
+    firestore()
+      .collection('menu')
+      .where('jenis', '==', 'minuman')
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          listGet.push(documentSnapshot.data());
+          listId.push(documentSnapshot.id);
+        });
+        setList(listGet);
+        setIdItem(listId);
+      });
+  };
+
+  const getStatus = () => {
+    firestore()
+      .collection('pesanan')
+      .where('meja', '==', noMeja)
+      .where('pemesan', '==', namaPemesan)
+      .get()
+      .then(querySnapshot => {
+        console.log(querySnapshot.size);
+        console.log('ini');
+        if (querySnapshot.size === 0) {
+          setStatusPesan('belum');
+        } else {
+          setStatusPesan('sudah');
+        }
+        console.log(statusPesan);
+      });
+  };
+
   useEffect(() => {
-    getFireData();
+    if (once === 0) {
+      const bootstrapAsync = async () => {
+        let nama;
+        let nomeja;
+        try {
+          nama = await AsyncStorage.getItem('namaPemesan');
+          nomeja = await AsyncStorage.getItem('nomorMeja');
+        } catch (e) {}
+        setNamaPemesan(nama);
+        setNoMeja(nomeja);
+      };
+      getFireData();
+      cekHarga(keranjang);
+      getStatus();
+      bootstrapAsync();
+      setOnce(1);
+    }
     cekHarga(keranjang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [keranjang]);
 
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
 
   const getData = () => {
-    axios.get('http://0.0.0.0:3000/MenuMinuman').then(res => {
+    axios.get('http://0.0.0.0:3000/Menuminuman').then(res => {
       setList(res.data);
     });
   };
@@ -80,15 +116,18 @@ const MinumanPage = () => {
         <Image style={styles.headerImage} source={header} />
         <Image style={styles.headerlogo} source={logo} />
       </View>
-      <Text style={styles.title}>Daftar Minuman</Text>
+      <Text style={styles.title}>Daftar minuman</Text>
       <ScrollView vertical>
         {list.map((item, i) => {
           return (
             <ItemMinuman
-              key={item.nama}
+              key={idItem[i]}
+              idItemDiDB={idItem[i]}
               namaItem={item.nama}
               jumlahItem={item.stok}
               hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
             />
           );
         })}
@@ -105,15 +144,22 @@ const MinumanPage = () => {
             {currencyFormat(totalHarga)}
           </Text>
         </Text>
-        <TouchableOpacity style={styles.Btn}>
-          <Text
-            style={styles.btnText}
-            onPress={() => {
-              cekHarga(keranjang);
-            }}>
-            Cek Harga
+        {statusPesan === 'belum' && (
+          <TouchableOpacity style={styles.Btn}>
+            <Text
+              style={styles.btnText}
+              onPress={() => {
+                navigation.navigate('KeranjangPelanggan');
+              }}>
+              Cek Keranjang
+            </Text>
+          </TouchableOpacity>
+        )}
+        {statusPesan === 'sudah' && (
+          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>
+            Sudah Memesan
           </Text>
-        </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -122,7 +168,6 @@ const MinumanPage = () => {
 export default MinumanPage;
 
 const styles = StyleSheet.create({
-  itemContainer: {margin: 10, flexDirection: 'row'},
   itemData: {marginStart: wp('5%'), flex: 1},
   itemImage: {height: hp('10%'), width: wp('20%')},
   itemJumlah: {
@@ -163,7 +208,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   Btn: {
-    width: wp('25%'),
+    width: wp('27%'),
     backgroundColor: '#f39c12',
     borderRadius: hp('4%'),
     height: hp('4.5%'),

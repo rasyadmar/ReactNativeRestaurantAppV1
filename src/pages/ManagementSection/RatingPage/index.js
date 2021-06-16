@@ -8,20 +8,38 @@ import {
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
 import ItemReview from './itemReview';
-
-let dummyReview = [
-  {id: 1, pereview: 'budi', review: 1},
-  {id: 2, pereview: 'maman', review: 2},
-  {id: 3, pereview: 'memet', review: 1},
-  {id: 4, pereview: 'amir', review: 5},
-  {id: 5, pereview: 'samir', review: 2},
-  {id: 6, pereview: 'lail', review: 5},
-  {id: 7, pereview: 'jono', review: 5},
-];
+import firestore from '@react-native-firebase/firestore';
 
 const RatingPage = () => {
   const [rating, setRating] = useState(1);
-  const [dummy, setDummy] = useState([]);
+  const [reviewId, setReviewId] = useState([]);
+  const [reviewList, setReviewList] = useState({});
+  const [dummy, setDummy] = useState([
+    {id: 1, pereview: 'budi', review: 1},
+    {id: 2, pereview: 'maman', review: 2},
+    {id: 3, pereview: 'memet', review: 5},
+    {id: 4, pereview: 'amir', review: 5},
+    {id: 5, pereview: 'samir', review: 2},
+    {id: 6, pereview: 'lail', review: 5},
+    {id: 7, pereview: 'jono', review: 5},
+  ]);
+
+  const getDataFromFire = () => {
+    let listGet = [];
+    let idReview = [];
+    firestore()
+      .collection('menu')
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          listGet.push(documentSnapshot.data());
+          idReview.push(documentSnapshot.id());
+        });
+        setReviewList(listGet);
+        setReviewId(idReview);
+      });
+  };
+
   const countRating = () => {
     let dumRating = 0;
     dummy.map(item => {
@@ -31,7 +49,6 @@ const RatingPage = () => {
   };
   useEffect(() => {
     countRating();
-    setDummy(dummyReview);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

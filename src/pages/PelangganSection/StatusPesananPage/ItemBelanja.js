@@ -13,12 +13,20 @@ import {
   decreaseItemQty,
 } from '../../../features/keranjangSlice';
 import {useSelector} from 'react-redux';
+import storage from '@react-native-firebase/storage';
+
 import {selectKeranjang} from '../../../features/keranjangSlice';
 
-export default function ItemBelanja({namaItem, jumlahItem, hargaItem}) {
+export default function ItemBelanja({
+  namaItem,
+  jumlahItem,
+  hargaItem,
+  linkGambar,
+}) {
   const dispatch = useDispatch();
   const keranjang = useSelector(selectKeranjang);
   const [qty, setQty] = useState(0);
+  const [urlGambar, setUrlGambar] = useState('');
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
@@ -34,6 +42,12 @@ export default function ItemBelanja({namaItem, jumlahItem, hargaItem}) {
   };
   useEffect(() => {
     // checkKeranjang();
+    const bootstrapAsync = async () => {
+      const url = await storage().ref(linkGambar).getDownloadURL();
+      console.log(linkGambar);
+      setUrlGambar(url);
+    };
+    bootstrapAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -41,7 +55,8 @@ export default function ItemBelanja({namaItem, jumlahItem, hargaItem}) {
     <View style={styles.itemContainer}>
       <Image
         source={{
-          uri: `https://icotar.com/avatar/${namaItem}.png`,
+          // uri: `https://icotar.com/avatar/${namaItem}.png`,
+          uri: urlGambar,
         }}
         style={styles.itemImage}
       />

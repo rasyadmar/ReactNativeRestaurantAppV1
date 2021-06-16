@@ -24,13 +24,13 @@ const MainPage = ({navigation}) => {
         }}>
         <Text style={styles.btnText}>Perbarui Stok Menu</Text>
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.Btn}
         onPress={() => {
           navigation.navigate('ChatPelangganPelayan');
         }}>
         <Text style={styles.btnText}>Hubungi Pelanggan</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

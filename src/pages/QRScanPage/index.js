@@ -21,9 +21,12 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function QRScanPage({navigation}) {
-  const {toMainPelanggan, toPelayan, toManagement, toKasir} = React.useContext(
-    AuthContext,
-  );
+  const {
+    toMainPelanggan,
+    toPelayan,
+    toKasir,
+    toLoginManagement,
+  } = React.useContext(AuthContext);
   // const {management} = React.useContext(AuthContext);
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export default function QRScanPage({navigation}) {
       regisFirebase();
       toPelayan();
     } else if (e.data === 'nariwimanagement') {
-      toManagement();
+      toLoginManagement();
     } else if (e.data === 'nariwikasir') {
       regisFirebase();
       toKasir();

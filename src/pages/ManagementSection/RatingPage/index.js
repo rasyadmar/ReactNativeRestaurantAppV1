@@ -13,42 +13,34 @@ import firestore from '@react-native-firebase/firestore';
 const RatingPage = () => {
   const [rating, setRating] = useState(1);
   const [reviewId, setReviewId] = useState([]);
-  const [reviewList, setReviewList] = useState({});
-  const [dummy, setDummy] = useState([
-    {id: 1, pereview: 'budi', review: 1},
-    {id: 2, pereview: 'maman', review: 2},
-    {id: 3, pereview: 'memet', review: 5},
-    {id: 4, pereview: 'amir', review: 5},
-    {id: 5, pereview: 'samir', review: 2},
-    {id: 6, pereview: 'lail', review: 5},
-    {id: 7, pereview: 'jono', review: 5},
-  ]);
+  const [reviewList, setReviewList] = useState([]);
 
   const getDataFromFire = () => {
     let listGet = [];
     let idReview = [];
     firestore()
-      .collection('menu')
+      .collection('review')
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           listGet.push(documentSnapshot.data());
-          idReview.push(documentSnapshot.id());
+          idReview.push(documentSnapshot.id);
         });
         setReviewList(listGet);
         setReviewId(idReview);
+        countRating(listGet);
       });
   };
 
-  const countRating = () => {
-    let dumRating = 0;
-    dummy.map(item => {
-      dumRating = dumRating + item.review;
+  const countRating = listGet => {
+    let rating = 0;
+    listGet.map(item => {
+      rating = rating + item.review;
     });
-    setRating((dumRating / dummy.length).toFixed(1));
+    setRating((rating / listGet.length).toFixed(1));
   };
   useEffect(() => {
-    countRating();
+    getDataFromFire();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -75,12 +67,13 @@ const RatingPage = () => {
         />
       </View>
       <ScrollView>
-        {dummy.map(item => {
+        {reviewList.map((item, i) => {
           return (
             <ItemReview
-              key={item.id}
-              pereview={item.pereview}
+              key={reviewId[i]}
+              pereview={item.pemesan}
               review={item.review}
+              komentar={item.komentar}
             />
           );
         })}

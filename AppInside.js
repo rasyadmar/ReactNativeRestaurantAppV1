@@ -24,6 +24,7 @@ import RekapitulasiPembayaranPage from './src/pages/ManagementSection/Rekapitula
 import MainPageManagement from './src/pages/ManagementSection/MainPage';
 import DetailRekapitulasiMenu from './src/pages/ManagementSection/RekapitulasiMenuPage/DetailRekapitulasi';
 import DetailRekapitulasiBayar from './src/pages/ManagementSection/RekapitulasiPembayaranPage/DetailRekapitulasi';
+import LoginManagement from './src/pages/ManagementSection/LoginPage';
 import {AuthContext} from './utils/authContext';
 import {reducer, initialState} from './reducer';
 
@@ -36,13 +37,18 @@ const AppInside = ({navigation}) => {
       let sekarang;
       let nama;
       let nomeja;
+      let loginManage;
       try {
         sekarang = await AsyncStorage.getItem('sekarang');
         nama = await AsyncStorage.getItem('namaPemesan');
         nomeja = await AsyncStorage.getItem('nomorMeja');
+        loginManage = await AsyncStorage.getItem('loginManagementStat');
       } catch (e) {}
       if (sekarang === 'udahregispelanggan') {
         dispatch({type: 'TO_PELANGGAN'});
+      }
+      if (loginManage === 'udahlogin') {
+        dispatch({type: 'TO_MANAGEMENT'});
       }
     };
     bootstrapAsync();
@@ -69,6 +75,9 @@ const AppInside = ({navigation}) => {
       toKasir: async data => {
         dispatch({type: 'TO_KASIR'});
       },
+      toLoginManagement: async data => {
+        dispatch({type: 'TO_LOGINMANAGEMENT'});
+      },
     }),
     [],
   );
@@ -92,6 +101,9 @@ const AppInside = ({navigation}) => {
     }
     if (state.toKasir) {
       le = 'KASIR';
+    }
+    if (state.toLoginManagement) {
+      le = 'LOGINMANAGEMENT';
     }
     let arr = [];
 
@@ -164,6 +176,11 @@ const AppInside = ({navigation}) => {
               }}
             />
           </>,
+        );
+        break;
+      case 'LOGINMANAGEMENT':
+        arr.push(
+          <Stack.Screen name="LoginManagement" component={LoginManagement} />,
         );
         break;
       case 'MANAGEMENT':

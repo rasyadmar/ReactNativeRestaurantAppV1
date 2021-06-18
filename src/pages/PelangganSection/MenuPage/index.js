@@ -72,17 +72,12 @@ export default function MenuPage({route, navigation}) {
             AsyncStorage.setItem('namaPemesan', '');
             AsyncStorage.setItem('nomorMeja', '');
             toQrScan();
+            dispatch(deleteAll());
+            try {
+              logOut();
+            } catch (e) {}
           }}>
-          <Text
-            style={styles.btnTextFooter}
-            onPress={() => {
-              dispatch(deleteAll());
-              try {
-                logOut();
-              } catch (e) {}
-            }}>
-            Log Out
-          </Text>
+          <Text style={styles.btnTextFooter}>Log Out</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.BtnNotif}

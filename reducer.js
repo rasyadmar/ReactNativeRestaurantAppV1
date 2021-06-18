@@ -9,6 +9,7 @@ export const reducer = (prevState, action) => {
         toPeyalan: false,
         toManagement: false,
         toKasir: false,
+        toLoginManagement: false,
       };
     case 'TO_PELANGGAN':
       return {
@@ -19,6 +20,7 @@ export const reducer = (prevState, action) => {
         toPeyalan: false,
         toManagement: false,
         toKasir: false,
+        toLoginManagement: false,
       };
     case 'TO_PELAYAN':
       return {
@@ -29,6 +31,7 @@ export const reducer = (prevState, action) => {
         toPeyalan: true,
         toManagement: false,
         toKasir: false,
+        toLoginManagement: false,
       };
     case 'TO_MANAGEMENT':
       return {
@@ -39,6 +42,7 @@ export const reducer = (prevState, action) => {
         toPeyalan: false,
         toManagement: true,
         toKasir: false,
+        toLoginManagement: false,
       };
     case 'TO_QRSCAN':
       return {
@@ -49,6 +53,7 @@ export const reducer = (prevState, action) => {
         toPeyalan: false,
         toManagement: false,
         toKasir: false,
+        toLoginManagement: false,
       };
     case 'TO_KASIR':
       return {
@@ -59,6 +64,18 @@ export const reducer = (prevState, action) => {
         toPeyalan: false,
         toManagement: false,
         toKasir: true,
+        toLoginManagement: false,
+      };
+    case 'TO_LOGINMANAGEMENT':
+      return {
+        ...prevState,
+        toQrScan: false,
+        toMainPelanggan: false,
+        toPelanggan: false,
+        toPeyalan: false,
+        toManagement: false,
+        toKasir: false,
+        toLoginManagement: true,
       };
     case 'RESTORE_STATE':
       return {
@@ -76,4 +93,5 @@ export const initialState = {
   toManagement: false,
   statusPesan: false,
   toKasir: false,
+  toLoginManagement: false,
 };

@@ -16,9 +16,21 @@ import {useEffect} from 'react/cjs/react.development';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from '../../../../utils/authContext';
 import auth from '@react-native-firebase/auth';
+import {useDispatch} from 'react-redux';
+import {deleteAll} from '../../../features/keranjangSlice';
 
 export default function MenuPage({route, navigation}) {
+  const dispatch = useDispatch();
   const {toQrScan} = React.useContext(AuthContext);
+
+  const logOut = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        console.log('log Out');
+      });
+  };
+
   return (
     <View style={styles.container}>
       <Image source={logo} style={styles.logo} />
@@ -64,10 +76,9 @@ export default function MenuPage({route, navigation}) {
           <Text
             style={styles.btnTextFooter}
             onPress={() => {
+              dispatch(deleteAll());
               try {
-                auth()
-                  .signOut()
-                  .then(() => console.log('User signed out!'));
+                logOut();
               } catch (e) {}
             }}>
             Log Out

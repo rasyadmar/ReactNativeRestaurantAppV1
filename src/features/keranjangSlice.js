@@ -11,6 +11,9 @@ const keranjangSlice = createSlice({
     addToKeranjang: (state, action) => {
       state.keranjangList.push(action.payload.data);
     },
+    deleteAll: (state, action) => {
+      state.keranjangList = [];
+    },
     deleteFromKeranjang: (state, action) => {
       state.keranjangList = state.keranjangList.filter(obj => {
         return obj.nama !== action.payload;
@@ -35,6 +38,7 @@ const keranjangSlice = createSlice({
 
 export const {
   addToKeranjang,
+  deleteAll,
   deleteFromKeranjang,
   increaseItemQty,
   decreaseItemQty,

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {TextInput} from 'react-native';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, ToastAndroid, Text, View, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Rating, AirbnbRating} from 'react-native-ratings';
 import {
@@ -12,48 +12,54 @@ import logo from '../../../assets/image/img_logo.jpeg';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const GiveReviewPage = () => {
+const GiveReviewPage = ({navigation}) => {
   const [rating, setRating] = useState(0);
   const [komentar, setKomentar] = useState('');
   const [namaPemesan, setNamaPemesan] = useState('');
   const [noMeja, setNoMeja] = useState('');
 
   const submitReview = () => {
-    firestore()
-      .collection('review')
-      .where('pemesan', '==', namaPemesan)
-      .get()
-      .then(querySnapshot => {
-        console.log(querySnapshot.size);
-        if (querySnapshot.size === 0) {
-          console.log('adding komentar');
-          firestore()
-            .collection('review')
-            .add({
-              pemesan: namaPemesan,
-              review: rating,
-              komentar: komentar,
-            })
-            .then(() => {
-              console.log('Komentar added!');
+    if (rating === 0 || komentar === '') {
+      ToastAndroid.show('Rating dan Komentar Harus Di Isi', ToastAndroid.SHORT);
+    } else {
+      ToastAndroid.show('Terimakasih Sudah Memberi Review', ToastAndroid.SHORT);
+      firestore()
+        .collection('review')
+        .where('pemesan', '==', namaPemesan)
+        .get()
+        .then(querySnapshot => {
+          console.log(querySnapshot.size);
+          if (querySnapshot.size === 0) {
+            console.log('adding komentar');
+            firestore()
+              .collection('review')
+              .add({
+                pemesan: namaPemesan,
+                review: rating,
+                komentar: komentar,
+              })
+              .then(() => {
+                console.log('Komentar added!');
+              });
+          } else {
+            querySnapshot.forEach(documentSnapshot => {
+              if (documentSnapshot.exists) {
+                firestore()
+                  .collection('review')
+                  .doc(documentSnapshot.id)
+                  .update({
+                    review: rating,
+                    komentar: komentar,
+                  })
+                  .then(() => {
+                    console.log('Komentar updated!');
+                  });
+              }
             });
-        } else {
-          querySnapshot.forEach(documentSnapshot => {
-            if (documentSnapshot.exists) {
-              firestore()
-                .collection('review')
-                .doc(documentSnapshot.id)
-                .update({
-                  review: rating,
-                  komentar: komentar,
-                })
-                .then(() => {
-                  console.log('Komentar updated!');
-                });
-            }
-          });
-        }
-      });
+          }
+          navigation.navigate('MenuPelanggan');
+        });
+    }
   };
 
   const ratingCompleted = rating => {

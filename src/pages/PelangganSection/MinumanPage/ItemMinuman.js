@@ -34,12 +34,12 @@ export default function ItemBelanja({
 
   const checkKeranjang = () => {
     if (keranjang.length) {
+      let a = 0;
       keranjang.map(item => {
         if (item.nama === namaItem) {
-          setQty(item.qty);
-        } else {
-          setQty(0);
+          a = item.qty;
         }
+        setQty(a);
       });
     }
   };
@@ -49,11 +49,6 @@ export default function ItemBelanja({
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
       setUrlGambar(url);
-      let status;
-      try {
-        status = await AsyncStorage.getItem('statusPesan');
-      } catch (e) {}
-      setStatusPesan(status);
     };
     bootstrapAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps

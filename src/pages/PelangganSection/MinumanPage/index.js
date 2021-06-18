@@ -28,8 +28,6 @@ const MinumanPage = ({navigation}) => {
   const [totalHarga, setTotalHarga] = useState(0);
   const [statusPesan, setStatusPesan] = useState('');
   const keranjang = useSelector(selectKeranjang);
-  const [namaPemesan, setNamaPemesan] = useState('');
-  const [noMeja, setNoMeja] = useState('');
   const [once, setOnce] = useState(0);
 
   const cekHarga = items => {
@@ -61,15 +59,16 @@ const MinumanPage = ({navigation}) => {
       });
   };
 
-  const getStatus = () => {
+  const getStatus = (nama, nomeja) => {
+    console.log('Getting Status');
     firestore()
       .collection('pesanan')
-      .where('meja', '==', noMeja)
-      .where('pemesan', '==', namaPemesan)
+      .where('meja', '==', nomeja)
+      .where('pemesan', '==', nama)
       .get()
       .then(querySnapshot => {
         console.log(querySnapshot.size);
-        console.log('ini');
+        console.log('minum');
         if (querySnapshot.size === 0) {
           setStatusPesan('belum');
         } else {
@@ -88,12 +87,10 @@ const MinumanPage = ({navigation}) => {
           nama = await AsyncStorage.getItem('namaPemesan');
           nomeja = await AsyncStorage.getItem('nomorMeja');
         } catch (e) {}
-        setNamaPemesan(nama);
-        setNoMeja(nomeja);
+        getStatus(nama, nomeja);
       };
       getFireData();
       cekHarga(keranjang);
-      getStatus();
       bootstrapAsync();
       setOnce(1);
     }

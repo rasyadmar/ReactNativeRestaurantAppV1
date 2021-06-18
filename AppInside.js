@@ -11,6 +11,8 @@ import StatusPesananPelanggan from './src/pages/PelangganSection/StatusPesananPa
 import MinumanPagePelanggan from './src/pages/PelangganSection/MinumanPage';
 import GiveReviewPage from './src/pages/PelangganSection/GiveReviewPage';
 import NotificationPage from './src/pages/PelangganSection/NotificationPage';
+import KasirPage from './src/pages/KasirSection/KasirPage';
+import DetailPelangganKasir from './src/pages/KasirSection/KasirPage/detailPelanggan';
 import MainPagePelayan from './src/pages/PelayanSection/MainPage';
 import DaftarPesananPelayan from './src/pages/PelayanSection/DaftarPesananPage';
 import UpdateStokPelayan from './src/pages/PelayanSection/UpdateStokPage';
@@ -64,6 +66,9 @@ const AppInside = ({navigation}) => {
       toQrScan: async data => {
         dispatch({type: 'TO_QRSCAN'});
       },
+      toKasir: async data => {
+        dispatch({type: 'TO_KASIR'});
+      },
     }),
     [],
   );
@@ -85,9 +90,23 @@ const AppInside = ({navigation}) => {
     if (state.toMainPelanggan) {
       le = 'MAINPELANGGAN';
     }
+    if (state.toKasir) {
+      le = 'KASIR';
+    }
     let arr = [];
 
     switch (le) {
+      case 'KASIR':
+        arr.push(
+          <>
+            <Stack.Screen name="KasirPage" component={KasirPage} />
+            <Stack.Screen
+              name="DetailPelangganKasir"
+              component={DetailPelangganKasir}
+            />
+          </>,
+        );
+        break;
       case 'MAINPELANGGAN':
         arr.push(
           <Stack.Screen name="MainPelanggan" component={MainPagePelanggan} />,

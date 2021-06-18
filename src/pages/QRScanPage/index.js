@@ -21,7 +21,7 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function QRScanPage({navigation}) {
-  const {toMainPelanggan, toPelayan, toManagement} = React.useContext(
+  const {toMainPelanggan, toPelayan, toManagement, toKasir} = React.useContext(
     AuthContext,
   );
   // const {management} = React.useContext(AuthContext);
@@ -30,7 +30,7 @@ export default function QRScanPage({navigation}) {
     AsyncStorage.setItem('statusPesan', 'belum');
   }, []);
 
-  const onSuccess = e => {
+  const regisFirebase = () => {
     auth()
       .signInAnonymously()
       .then(() => {
@@ -48,13 +48,21 @@ export default function QRScanPage({navigation}) {
       .then(token => {
         console.log('this is token: ', token);
       });
+  };
+
+  const onSuccess = e => {
     if (e.data === 'nariwipelanggan') {
+      regisFirebase();
       toMainPelanggan();
       console.log('asd');
     } else if (e.data === 'nariwipelayan') {
+      regisFirebase();
       toPelayan();
     } else if (e.data === 'nariwimanagement') {
       toManagement();
+    } else if (e.data === 'nariwikasir') {
+      regisFirebase();
+      toKasir();
     }
   };
 

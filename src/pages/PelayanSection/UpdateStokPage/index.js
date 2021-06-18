@@ -18,9 +18,110 @@ import {
 import ItemStok from './ItemStok';
 
 const UpdatestokPage = () => {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState([
+    {
+      id: '1',
+      item: 'Ayam Goreng',
+      jumlah: 2,
+      harga: 1000,
+      jenis: 'makanan',
+    },
+    {
+      id: '2',
+      item: 'Ayam Panggang',
+      jumlah: 3,
+      harga: 2000,
+      jenis: 'makanan',
+    },
+    {
+      id: '3',
+      item: 'Ayam Opor',
+      jumlah: 2,
+      harga: 3000,
+      jenis: 'makanan',
+    },
+    {
+      id: '4',
+      item: 'Bebek Goreng',
+      jumlah: 3,
+      harga: 1200,
+      jenis: 'makanan',
+    },
+    {
+      id: '5',
+      item: 'Bebek Panggang',
+      jumlah: 2,
+      harga: 1320,
+      jenis: 'makanan',
+    },
+    {
+      id: '6',
+      item: 'Ikan Goreng',
+      jumlah: 3,
+      harga: 1000,
+      jenis: 'makanan',
+    },
+    {
+      id: '7',
+      item: 'Ikan Bakar',
+      jumlah: 2,
+      harga: 1000,
+      jenis: 'makanan',
+    },
+    {id: '8', item: 'Sup Ikan', jumlah: 3, harga: 1000, jenis: 'makanan'},
+    {
+      id: '1',
+      item: 'Teh',
+      jumlah: 2,
+      harga: 1000,
+      jenis: 'minuman',
+    },
+    {
+      id: '2',
+      item: 'Jeruk',
+      jumlah: 3,
+      harga: 2000,
+      jenis: 'minuman',
+    },
+    {
+      id: '3',
+      item: 'Kopi',
+      jumlah: 2,
+      harga: 3000,
+      jenis: 'minuman',
+    },
+    {
+      id: '4',
+      item: 'Air Putih',
+      jumlah: 3,
+      harga: 1200,
+      jenis: 'minuman',
+    },
+    {
+      id: '5',
+      item: 'Jus Jambu',
+      jumlah: 2,
+      harga: 1320,
+      jenis: 'minuman',
+    },
+    {
+      id: '6',
+      item: 'Jus Mangga',
+      jumlah: 3,
+      harga: 1000,
+      jenis: 'minuman',
+    },
+    {
+      id: '7',
+      item: 'Jus Duren',
+      jumlah: 2,
+      harga: 1000,
+      jenis: 'minuman',
+    },
+    {id: '8', item: 'Jus Alpukat', jumlah: 3, harga: 1000, jenis: 'minuman'},
+  ]);
   useEffect(() => {
-    getMenu();
+    // getMenu();
     // getMinuman();
     // combine();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -28,8 +28,6 @@ const MakananPage = ({navigation}) => {
   const [totalHarga, setTotalHarga] = useState(0);
   const [statusPesan, setStatusPesan] = useState('');
   const keranjang = useSelector(selectKeranjang);
-  const [namaPemesan, setNamaPemesan] = useState('');
-  const [noMeja, setNoMeja] = useState('');
   const [once, setOnce] = useState(0);
 
   const cekHarga = items => {
@@ -61,15 +59,16 @@ const MakananPage = ({navigation}) => {
       });
   };
 
-  const getStatus = () => {
+  const getStatus = (nama, nomeja) => {
+    console.log('Getting Status');
     firestore()
       .collection('pesanan')
-      .where('meja', '==', noMeja)
-      .where('pemesan', '==', namaPemesan)
+      .where('meja', '==', nomeja)
+      .where('pemesan', '==', nama)
       .get()
       .then(querySnapshot => {
         console.log(querySnapshot.size);
-        console.log('ini');
+        console.log('makan');
         if (querySnapshot.size === 0) {
           setStatusPesan('belum');
         } else {
@@ -80,6 +79,7 @@ const MakananPage = ({navigation}) => {
   };
 
   useEffect(() => {
+    console.log(once);
     if (once === 0) {
       const bootstrapAsync = async () => {
         let nama;
@@ -88,12 +88,10 @@ const MakananPage = ({navigation}) => {
           nama = await AsyncStorage.getItem('namaPemesan');
           nomeja = await AsyncStorage.getItem('nomorMeja');
         } catch (e) {}
-        setNamaPemesan(nama);
-        setNoMeja(nomeja);
+        getStatus(nama, nomeja);
       };
       getFireData();
       cekHarga(keranjang);
-      getStatus();
       bootstrapAsync();
       setOnce(1);
     }

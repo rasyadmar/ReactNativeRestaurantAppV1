@@ -74,12 +74,12 @@ export default function ItemBelanja({
       );
       if (qty === 1) {
         dispatch(deleteFromKeranjang(namaItem));
-        dispatch(
-          decreaseItemQty({
-            namaItem: namaItem,
-            qty: qty,
-          }),
-        );
+        // dispatch(
+        //   decreaseItemQty({
+        //     namaItem: namaItem,
+        //     qty: 0,
+        //   }),
+        // );
       }
     }
   };

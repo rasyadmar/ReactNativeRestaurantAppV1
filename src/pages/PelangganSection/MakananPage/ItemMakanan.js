@@ -34,12 +34,12 @@ export default function ItemBelanja({
 
   const checkKeranjang = () => {
     if (keranjang.length) {
+      let a = 0;
       keranjang.map(item => {
         if (item.nama === namaItem) {
-          setQty(item.qty);
-        } else {
-          setQty(0);
+          a = item.qty;
         }
+        setQty(a);
       });
     }
   };
@@ -50,6 +50,7 @@ export default function ItemBelanja({
       // console.log(linkGambar);
       setUrlGambar(url);
     };
+    console.log('refresh item makan');
     bootstrapAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keranjang]);
@@ -71,7 +72,7 @@ export default function ItemBelanja({
               tipe: 'makanan',
               linkGambar: linkGambar,
             },
-            id: Date.now(),
+            id: new Date().getMilliseconds(),
           }),
         );
       }

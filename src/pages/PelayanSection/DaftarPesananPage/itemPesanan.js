@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     fontSize: hp('1.8%'),
   },
   BtnClose: {
-    width: wp('7%'),
+    width: hp('3.5%'),
     paddingBottom: hp('0.2%'),
     marginBottom: hp('0.5%'),
     marginHorizontal: wp('1%'),

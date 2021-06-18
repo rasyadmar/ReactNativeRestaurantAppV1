@@ -6,11 +6,14 @@ export const stateConditionString = state => {
   if (state.toPelanggan) {
     navigateTo = 'PELANGGAN';
   }
-  if (!state.toPeyalan) {
+  if (state.toPeyalan) {
     navigateTo = 'PELAYAN';
   }
-  if (!state.toManagement) {
+  if (state.toManagement) {
     navigateTo = 'MANAGEMENT';
+  }
+  if (state.toKasir) {
+    navigateTo = 'KASIR';
   }
   return navigateTo;
 };

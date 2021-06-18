@@ -48,6 +48,20 @@ const StatusPesananPage = ({navigation}) => {
         navigation.navigate('GiveReviewPage');
       });
   };
+  function onResult(querySnapshot) {
+    querySnapshot.forEach(documentSnapshot => {
+      console.log(documentSnapshot);
+      setList(documentSnapshot.data().pesanan);
+      setDocName(documentSnapshot.id);
+      setTotalHarga(documentSnapshot.data().totalHarga);
+      setProgress(documentSnapshot.data().progress);
+    });
+  }
+
+  function onError(error) {
+    console.error(error);
+  }
+
   useEffect(() => {
     const bootstrapAsync = async () => {
       let nama;
@@ -59,26 +73,18 @@ const StatusPesananPage = ({navigation}) => {
       } finally {
         setNamaPemesan(nama);
         setNoMeja(nomeja);
+        console.log('Get List Pesanan');
         firestore()
           .collection('pesanan')
           .where('meja', '==', nomeja)
           .where('pemesan', '==', nama)
-          .get()
-          .then(querySnapshot => {
-            querySnapshot.forEach(documentSnapshot => {
-              setList(documentSnapshot.data().pesanan);
-              setDocName(documentSnapshot.id);
-              setTotalHarga(documentSnapshot.data().totalHarga);
-              setProgress(documentSnapshot.data().progress);
-            });
-          });
+          .onSnapshot(onResult, onError);
       }
     };
     // getStorage();
     bootstrapAsync();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list]);
+  }, []);
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };

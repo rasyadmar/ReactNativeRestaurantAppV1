@@ -10,31 +10,98 @@ import {useState, useEffect} from 'react/cjs/react.development';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
 import ItemMenuTerjual from './itemTotalTerjual';
-
-let dummyDataMinggu = [
-  {minggu: 'Minggu 1', totalHarga: 425310000},
-  {minggu: 'Minggu 2', totalHarga: 524315000},
-  {minggu: 'Minggu 3', totalHarga: 403120000},
-  {minggu: 'Minggu 4', totalHarga: 112310000},
-];
+import firestore from '@react-native-firebase/firestore';
 
 const DetailRekapitulasi = ({route}) => {
-  const {bulan} = route.params;
-  const [dummyMinggu, setDummyMinggu] = useState([]);
+  const {bulan, tahun} = route.params;
+  const [textbulan, setTextBulan] = useState('');
+  const [dataList, setDataList] = useState([]);
+  const [mingguSatu, setMingguSatu] = useState(0);
+  const [mingguDua, setMingguDua] = useState(0);
+  const [mingguTiga, setMingguTiga] = useState(0);
+  const [mingguEmpat, setMingguEmpat] = useState(0);
+
+  const getFireData = () => {
+    let listData = [];
+    // let listId = [];
+    firestore()
+      .collection('DiBayar')
+      .where('bulan', '==', bulan)
+      .where('tahun', '==', tahun)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          console.log(documentSnapshot);
+          listData.push(documentSnapshot.data());
+          // listId.push(documentSnapshot.id);
+        });
+        sorting(listData);
+        // setIdItem(listId);
+      });
+  };
+
+  const sorting = sort => {
+    let data1 = 0,
+      data2 = 0,
+      data3 = 0,
+      data4 = 0;
+    sort.map(item => {
+      if (item.tanggal <= 7) {
+        data1 = data1 + item.totalHarga;
+      } else if (item.tanggal <= 14) {
+        data2 = data2 + item.totalHarga;
+      } else if (item.tanggal <= 28) {
+        data3 = data3 + item.totalHarga;
+      } else {
+        data4 = data4 + item.totalHarga;
+      }
+    });
+    setDataList([
+      {minggu: 'Minggu 1', totalHarga: data1},
+      {minggu: 'Minggu 2', totalHarga: data2},
+      {minggu: 'Minggu 3', totalHarga: data3},
+      {minggu: 'Minggu 4', totalHarga: data4},
+    ]);
+    setMingguSatu(data1);
+    setMingguDua(data2);
+    setMingguTiga(data3);
+    setMingguEmpat(data4);
+  };
+  const formatingText = bulanIn => {
+    let listBulan = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    setTextBulan(listBulan[bulanIn]);
+  };
+
   useEffect(() => {
-    setDummyMinggu(dummyDataMinggu);
+    getFireData();
+    formatingText(bulan);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const screenWidth = Dimensions.get('window').width;
   const data = {
     labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
     datasets: [
       {
-        data: [34, 24, 40, 50],
+        data: [mingguSatu, mingguDua, mingguTiga, mingguEmpat],
         color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`, // optional
         strokeWidth: 3, // optional
       },
     ],
-    legend: [bulan], // optional
+    legend: [textbulan], // optional
   };
   const chartConfig = {
     backgroundGradientFrom: '#fff',
@@ -60,7 +127,7 @@ const DetailRekapitulasi = ({route}) => {
         chartConfig={chartConfig}
       />
       <ScrollView>
-        {dummyMinggu.map(item => {
+        {dataList.map(item => {
           return (
             <ItemMenuTerjual
               key={item.minggu}

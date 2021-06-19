@@ -8,32 +8,40 @@ import {
 } from 'react-native-responsive-screen';
 import ItemBulanRekapitulasi from './itemBulanRekapitulasi';
 import {ScrollView} from 'react-native-gesture-handler';
-
-let Bulan = [
-  'Januari 2021',
-  'Februari 2021',
-  'Maret 2021',
-  'April 2021',
-  'Mei 2021',
-  'Juni 2021',
-  'Juli 2021',
-  'Agustus 2021',
-  'September 2021',
-  'Oktober 2021',
-  'November 2021',
-  'Desember 2021',
-];
+import firestore from '@react-native-firebase/firestore';
 
 const RekapitulasiPembayaranPage = ({navigation}) => {
   const [bulan, setBulan] = useState([]);
+  const [tahun, setTahun] = useState([]);
+  const [listId, setListId] = useState([]);
+
+  const getFireData = () => {
+    let listBulan = [];
+    let listTahun = [];
+    let idList = [];
+    firestore()
+      .collection('DiBayar')
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          listBulan.push(documentSnapshot.data().bulan);
+          listTahun.push(documentSnapshot.data().tahun);
+          idList.push(documentSnapshot.id);
+        });
+        setBulan(listBulan);
+        setTahun(listTahun);
+        setListId(idList);
+      });
+  };
 
   useEffect(() => {
-    setBulan(Bulan);
+    getFireData();
   }, []);
 
-  const toDetailRekapitulasi = bulan => {
+  const toDetailRekapitulasi = (bulan, tahun) => {
     navigation.navigate('DetailRekapitulasiBayar', {
       bulan: bulan,
+      tahun: tahun,
     });
   };
   return (
@@ -44,12 +52,13 @@ const RekapitulasiPembayaranPage = ({navigation}) => {
       </View>
       <Text style={styles.title}>Rekapitulasi Pembayaran</Text>
       <ScrollView>
-        {bulan.map(item => {
+        {bulan.map((item, i) => {
           return (
             <ItemBulanRekapitulasi
-              key={item}
+              key={listId[i]}
               bulan={item}
-              toDetailRekapitulasi={() => toDetailRekapitulasi(item)}
+              tahun={tahun[i]}
+              toDetailRekapitulasi={() => toDetailRekapitulasi(item, tahun[i])}
             />
           );
         })}

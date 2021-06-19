@@ -5,16 +5,38 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {useEffect, useState} from 'react/cjs/react.development';
 
-const itemBulanRekapitulasi = ({bulan, toDetailRekapitulasi}) => {
+const ItemBulanRekapitulasi = ({bulan, tahun, toDetailRekapitulasi}) => {
+  const [text, setText] = useState('');
+  const formatingText = (bulanIn, tahunIn) => {
+    let listBulan = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    setText(listBulan[bulanIn] + ' ' + tahunIn);
+  };
+  useEffect(() => {
+    formatingText(bulan, tahun);
+  });
   return (
     <TouchableOpacity style={styles.container} onPress={toDetailRekapitulasi}>
-      <Text style={styles.text}>{bulan}</Text>
+      <Text style={styles.text}>{text}</Text>
     </TouchableOpacity>
   );
 };
 
-export default itemBulanRekapitulasi;
+export default ItemBulanRekapitulasi;
 
 const styles = StyleSheet.create({
   container: {

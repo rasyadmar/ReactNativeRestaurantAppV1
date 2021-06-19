@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     backgroundColor: '#ecf0f1',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: hp('1%'),
+    paddingHorizontal: hp('2%'),
   },
   inputText: {
     height: hp('20%'),

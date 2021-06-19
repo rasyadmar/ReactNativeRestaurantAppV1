@@ -161,7 +161,7 @@ const StatusPesananPage = ({navigation}) => {
           {progress === 'Sedang Di Antar' && (
             <>
               <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
-                Tekan Sudah Diantar Selesai:
+                Tekan Jika Sudah Sampai Dan Ingin Bayar:
               </Text>
               <TouchableOpacity
                 style={styles.BtnDelivered}
@@ -177,9 +177,9 @@ const StatusPesananPage = ({navigation}) => {
               <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
                 Silakan Bayar Ke Kasir:
               </Text>
-              <TouchableOpacity style={styles.BtnDelivered}>
+              <View style={styles.BtnDelivered}>
                 <Text style={styles.btnText}>Bayar</Text>
-              </TouchableOpacity>
+              </View>
             </>
           )}
         </View>

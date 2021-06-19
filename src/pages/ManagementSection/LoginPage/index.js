@@ -58,11 +58,7 @@ const MainPage = ({route, navigation}) => {
     if (emailManager === '' || password === '') {
       ToastAndroid.show('Email dan Password Harus Diisi', ToastAndroid.LONG);
     } else {
-      AsyncStorage.setItem('loginManagementStat', 'udahLogin');
-      //   AsyncStorage.setItem('emailManager', emailManager);
-      //   AsyncStorage.setItem('password', password);
       loginFireBase();
-      toManagement();
     }
   };
 

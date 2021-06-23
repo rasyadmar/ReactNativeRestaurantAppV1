@@ -5,8 +5,21 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import logo from '../../../assets/image/img_logo.jpeg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
+import {AuthContext} from '../../../../utils/authContext';
 
 const MainPage = ({navigation}) => {
+  const {toQrScan} = React.useContext(AuthContext);
+  const logOut = () => {
+    AsyncStorage.setItem('loginpelayan', 'belumlogin');
+    auth()
+      .signOut()
+      .then(() => {
+        toQrScan();
+        console.log('log Out');
+      });
+  };
   return (
     <View style={styles.container}>
       <Image source={logo} style={styles.logo} />
@@ -24,13 +37,25 @@ const MainPage = ({navigation}) => {
         }}>
         <Text style={styles.btnText}>Perbarui Stok Menu</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity
+      <TouchableOpacity
         style={styles.Btn}
         onPress={() => {
           navigation.navigate('ChatPelangganPelayan');
         }}>
         <Text style={styles.btnText}>Hubungi Pelanggan</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.BtnFooter}
+          onPress={() => {
+            AsyncStorage.setItem('loginManagementStat', 'belumlogin');
+            try {
+              logOut();
+            } catch (e) {}
+          }}>
+          <Text style={styles.btnTextFooter}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -63,6 +88,26 @@ const styles = StyleSheet.create({
   btnText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: hp('2.5%'),
+    fontSize: hp('2%'),
+  },
+  footer: {
+    width: wp('85%'),
+    flexDirection: 'row-reverse',
+    padding: wp('3%'),
+    justifyContent: 'space-between',
+  },
+  BtnFooter: {
+    width: wp('19%'),
+    backgroundColor: '#f39c12',
+    borderRadius: hp('4%'),
+    height: hp('4.5%'),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: hp('0.5%'),
+  },
+  btnTextFooter: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: hp('1.8%'),
   },
 });

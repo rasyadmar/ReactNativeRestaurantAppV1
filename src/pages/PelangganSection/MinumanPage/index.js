@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import {useEffect, useState} from 'react/cjs/react.development';
 import {
@@ -21,14 +22,31 @@ import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const MinumanPage = ({navigation}) => {
   const [list, setList] = useState([]);
   const [idItem, setIdItem] = useState([]);
+  const [listCoffee, setListCoffee] = useState([]);
+  const [idItemCoffee, setIdItemCoffee] = useState([]);
+  const [listJus, setListJus] = useState([]);
+  const [idItemJus, setIdItemJus] = useState([]);
+  const [listTeh, setListTeh] = useState([]);
+  const [idItemTeh, setIdItemTeh] = useState([]);
+  const [listMilk, setListMilk] = useState([]);
+  const [idItemMilk, setIdItemMilk] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
   const [statusPesan, setStatusPesan] = useState('');
   const keranjang = useSelector(selectKeranjang);
   const [once, setOnce] = useState(0);
+
+  const handleMassage = () => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('Status Pesanan Anda Telah DiPerbarui!');
+    });
+
+    return unsubscribe;
+  };
 
   const cekHarga = items => {
     let harga = 0;
@@ -78,6 +96,45 @@ const MinumanPage = ({navigation}) => {
       });
   };
 
+  const getDrink = region => {
+    let listGet = [];
+    let listId = [];
+    firestore()
+      .collection('menu')
+      .where('jenis', '==', 'minuman')
+      .where('region', '==', region)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          listGet.push(documentSnapshot.data());
+          listId.push(documentSnapshot.id);
+        });
+        // setListAsia(listGet);
+        // setIdItemAsia(listId);
+      });
+    return [listGet, listId];
+  };
+
+  const getAllRegion = () => {
+    console.log('get all region Drink');
+    let coffee = getDrink('coffee');
+    let jus = getDrink('jus');
+    let teh = getDrink('teh');
+    let milk = getDrink('milk');
+
+    setListCoffee(coffee[0]);
+    setIdItemCoffee(coffee[1]);
+
+    setListJus(jus[0]);
+    setIdItemJus(jus[1]);
+
+    setListTeh(teh[0]);
+    setIdItemTeh(teh[1]);
+
+    setListMilk(milk[0]);
+    setIdItemMilk(milk[1]);
+  };
+
   useEffect(() => {
     if (once === 0) {
       const bootstrapAsync = async () => {
@@ -89,12 +146,13 @@ const MinumanPage = ({navigation}) => {
         } catch (e) {}
         getStatus(nama, nomeja);
       };
-      getFireData();
+      getAllRegion();
       cekHarga(keranjang);
       bootstrapAsync();
       setOnce(1);
     }
     cekHarga(keranjang);
+    handleMassage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keranjang]);
 
@@ -115,11 +173,54 @@ const MinumanPage = ({navigation}) => {
       </View>
       <Text style={styles.title}>Daftar minuman</Text>
       <ScrollView vertical>
-        {list.map((item, i) => {
+        <Text style={styles.foodType}>Coffee</Text>
+        {listCoffee.map((item, i) => {
           return (
             <ItemMinuman
-              key={idItem[i]}
-              idItemDiDB={idItem[i]}
+              key={idItemCoffee[i]}
+              idItemDiDB={idItemCoffee[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Jus</Text>
+        {listJus.map((item, i) => {
+          return (
+            <ItemMinuman
+              key={idItemJus[i]}
+              idItemDiDB={idItemJus[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Teh</Text>
+        {listTeh.map((item, i) => {
+          return (
+            <ItemMinuman
+              key={idItemTeh[i]}
+              idItemDiDB={idItemTeh[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Milk</Text>
+        {listMilk.map((item, i) => {
+          return (
+            <ItemMinuman
+              key={idItemMilk[i]}
+              idItemDiDB={idItemMilk[i]}
               namaItem={item.nama}
               jumlahItem={item.stok}
               hargaItem={item.harga}
@@ -216,5 +317,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
+  },
+  foodType: {
+    margin: hp('1%'),
+    padding: hp('1%'),
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(127, 140, 141,0.1)',
+    fontSize: hp('2.5%'),
+    color: '#7f8c8d',
   },
 });

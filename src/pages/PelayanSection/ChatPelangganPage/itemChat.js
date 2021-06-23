@@ -1,82 +1,38 @@
 import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import firestore from '@react-native-firebase/firestore';
 
-const ItemPesanan = ({
+const ItemChat = ({
   idItem,
   namaPelanggan,
   nomorMeja,
-  status,
+  unReadMessage,
   detailFunction,
 }) => {
-  const deleteFireData = () => {
-    firestore()
-      .collection('pesanan')
-      .doc(idItem)
-      .delete()
-      .then(() => {
-        console.log('Delete Item Success');
-      });
-  };
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={detailFunction}>
-      <View>
-        <View style={styles.itemElement}>
-          <Text style={styles.itemName}>Pemesan: {namaPelanggan}</Text>
-          <TouchableOpacity
-            style={styles.BtnClose}
-            onPress={() => {
-              deleteFireData();
-            }}>
-            <Text style={styles.btnText}>x</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
       <View style={styles.itemElement}>
-        <Text style={styles.itemName}>Nomor Meja: {nomorMeja}</Text>
-        {status === 'Belum Di Proses' && (
-          <>
-            <View style={styles.BtnStatus}>
-              <Text style={styles.btnText}>{status}</Text>
-            </View>
-          </>
-        )}
-        {status === 'Sedang Di Proses' && (
-          <>
-            <View style={styles.BtnStatusOrange}>
-              <Text style={styles.btnText}>{status}</Text>
-            </View>
-          </>
-        )}
-        {status === 'Sedang Di Antar' && (
-          <>
-            <View style={styles.BtnStatusGreen}>
-              <Text style={styles.btnText}>{status}</Text>
-            </View>
-          </>
-        )}
-        {status === 'Bayar' && (
-          <>
-            <View style={styles.BtnStatusGreen}>
-              <Text style={styles.btnText}>{status}</Text>
-            </View>
-          </>
+        <Text style={styles.itemName}>Pemesan: {namaPelanggan}</Text>
+        {unReadMessage !== 0 && (
+          <TouchableOpacity style={styles.BtnUnread}>
+            <Text style={styles.btnText}>{unReadMessage}</Text>
+          </TouchableOpacity>
         )}
       </View>
+      <Text style={styles.itemName}>Nomor Meja: {nomorMeja}</Text>
     </TouchableOpacity>
   );
 };
 
-export default ItemPesanan;
+export default ItemChat;
 
 const styles = StyleSheet.create({
   itemContainer: {
     margin: 10,
-    // margin: hp('1%'),
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(127, 140, 141,0.1)',
     justifyContent: 'space-between',
@@ -101,14 +57,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
   },
-  BtnClose: {
-    width: hp('3.5%'),
-    paddingBottom: hp('0.2%'),
+  BtnUnread: {
+    paddingVertical: hp('0.5%'),
+    paddingHorizontal: hp('1%'),
     marginBottom: hp('0.5%'),
     marginHorizontal: wp('1%'),
-    backgroundColor: 'red',
+    backgroundColor: '#f39c12',
     borderRadius: hp('4%'),
-    height: hp('3.5%'),
     alignItems: 'center',
     justifyContent: 'center',
   },

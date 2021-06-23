@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import {useEffect, useState} from 'react/cjs/react.development';
 import {
@@ -21,14 +22,35 @@ import {useSelector} from 'react-redux';
 import {selectKeranjang} from '../../../features/keranjangSlice';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const MakananPage = ({navigation}) => {
   const [list, setList] = useState([]);
+  const [listAsia, setListAsia] = useState([]);
+  const [idItemAsia, setIdItemAsia] = useState([]);
+  const [listChinese, setListChinese] = useState([]);
+  const [idItemChinese, setIdItemChinese] = useState([]);
+  const [listSea, setListSea] = useState([]);
+  const [idItemSea, setIdItemSea] = useState([]);
+  const [listMieSnack, setListMieSnack] = useState([]);
+  const [idItemMieSnack, setIdItemMieSnack] = useState([]);
+  const [listSundanese, setListSudanese] = useState([]);
+  const [idItemSundanese, setIdItemSundanese] = useState([]);
+  const [listKorean, setListKorean] = useState([]);
+  const [idItemKorean, setIdItemKorean] = useState([]);
   const [idItem, setIdItem] = useState([]);
   const [totalHarga, setTotalHarga] = useState(0);
   const [statusPesan, setStatusPesan] = useState('');
   const keranjang = useSelector(selectKeranjang);
   const [once, setOnce] = useState(0);
+
+  const handleMassage = () => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('Status Pesanan Anda Telah DiPerbarui!');
+    });
+
+    return unsubscribe;
+  };
 
   const cekHarga = items => {
     let harga = 0;
@@ -40,6 +62,53 @@ const MakananPage = ({navigation}) => {
       });
     }
     setTotalHarga(harga);
+  };
+
+  const getFood = region => {
+    let listGet = [];
+    let listId = [];
+    firestore()
+      .collection('menu')
+      .where('jenis', '==', 'makanan')
+      .where('region', '==', region)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          listGet.push(documentSnapshot.data());
+          listId.push(documentSnapshot.id);
+        });
+        // setListAsia(listGet);
+        // setIdItemAsia(listId);
+      });
+    return [listGet, listId];
+  };
+
+  const getAllRegion = () => {
+    console.log('get all region food');
+    let asianFood = getFood('asia');
+    let chineseFood = getFood('chinese');
+    let seaFood = getFood('sea');
+    let mieSnack = getFood('miesnack');
+    let sundaneseFood = getFood('sunda');
+    let koreaFood = getFood('korea');
+
+    setListAsia(asianFood[0]);
+    setIdItemAsia(asianFood[1]);
+
+    setListChinese(chineseFood[0]);
+    setIdItemChinese(chineseFood[1]);
+
+    setListSea(seaFood[0]);
+    setIdItemSea(seaFood[1]);
+
+    setListMieSnack(mieSnack[0]);
+    setIdItemMieSnack(mieSnack[1]);
+
+    setListSudanese(sundaneseFood[0]);
+    setIdItemSundanese(sundaneseFood[1]);
+
+    setListKorean(koreaFood[0]);
+    setIdItemKorean(koreaFood[1]);
   };
 
   const getFireData = () => {
@@ -90,12 +159,13 @@ const MakananPage = ({navigation}) => {
         } catch (e) {}
         getStatus(nama, nomeja);
       };
-      getFireData();
+      getAllRegion();
       cekHarga(keranjang);
       bootstrapAsync();
       setOnce(1);
     }
     cekHarga(keranjang);
+    handleMassage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keranjang]);
 
@@ -116,11 +186,81 @@ const MakananPage = ({navigation}) => {
       </View>
       <Text style={styles.title}>Daftar Makanan</Text>
       <ScrollView vertical>
-        {list.map((item, i) => {
+        {listAsia.map((item, i) => {
           return (
             <ItemMakanan
-              key={idItem[i]}
-              idItemDiDB={idItem[i]}
+              key={idItemAsia[i]}
+              idItemDiDB={idItemAsia[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Chinese Food</Text>
+        {listChinese.map((item, i) => {
+          return (
+            <ItemMakanan
+              key={idItemChinese[i]}
+              idItemDiDB={idItemChinese[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>SeaFood</Text>
+        {listSea.map((item, i) => {
+          return (
+            <ItemMakanan
+              key={idItemSea[i]}
+              idItemDiDB={idItemSea[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Mie & Snack</Text>
+        {listMieSnack.map((item, i) => {
+          return (
+            <ItemMakanan
+              key={idItemMieSnack[i]}
+              idItemDiDB={idItemMieSnack[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Sundanese Food</Text>
+        {listSundanese.map((item, i) => {
+          return (
+            <ItemMakanan
+              key={idItemSundanese[i]}
+              idItemDiDB={idItemSundanese[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              hargaItem={item.harga}
+              linkGambar={item.linkGambar}
+              statusPes={statusPesan}
+            />
+          );
+        })}
+        <Text style={styles.foodType}>Korean Food</Text>
+        {listKorean.map((item, i) => {
+          return (
+            <ItemMakanan
+              key={idItemKorean[i]}
+              idItemDiDB={idItemKorean[i]}
               namaItem={item.nama}
               jumlahItem={item.stok}
               hargaItem={item.harga}
@@ -217,5 +357,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
+  },
+  foodType: {
+    margin: hp('1%'),
+    padding: hp('1%'),
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(127, 140, 141,0.1)',
+    fontSize: hp('2.5%'),
+    color: '#7f8c8d',
   },
 });

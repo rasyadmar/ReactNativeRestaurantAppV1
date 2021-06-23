@@ -6,22 +6,66 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import logo from '../../../assets/image/img_logo.jpeg';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {useEffect} from 'react/cjs/react.development';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from '../../../../utils/authContext';
 import auth from '@react-native-firebase/auth';
 import {useDispatch} from 'react-redux';
 import {deleteAll} from '../../../features/keranjangSlice';
+import messaging from '@react-native-firebase/messaging';
+import firestore from '@react-native-firebase/firestore';
+import {useEffect, useState} from 'react/cjs/react.development';
 
 export default function MenuPage({route, navigation}) {
   const dispatch = useDispatch();
   const {toQrScan} = React.useContext(AuthContext);
+  const [notif, setNotif] = useState(0);
+
+  const handleMassage = () => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('Status Pesanan Anda Telah DiPerbarui!');
+    });
+
+    return unsubscribe;
+  };
+
+  function onResult(querySnapshot) {
+    if (querySnapshot.fixed) {
+      querySnapshot.forEach(documentSnapshot => {
+        setNotif(
+          documentSnapshot.data().pesan.length -
+            documentSnapshot.data().readPelanggan.length,
+        );
+      });
+    }
+  }
+
+  function onError(error) {
+    console.error(error);
+  }
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      let nama;
+      let nomeja;
+      try {
+        nama = await AsyncStorage.getItem('namaPemesan');
+        nomeja = await AsyncStorage.getItem('nomorMeja');
+      } catch (e) {}
+      firestore()
+        .collection('chatlog')
+        .where('meja', '==', nomeja)
+        .where('pemesan', '==', nama)
+        .onSnapshot(onResult, onError);
+    };
+    handleMassage();
+  }, []);
 
   const logOut = () => {
     auth()
@@ -79,13 +123,25 @@ export default function MenuPage({route, navigation}) {
           }}>
           <Text style={styles.btnTextFooter}>Log Out</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.BtnNotif}
-          onPress={() => {
-            navigation.navigate('NotificationPage');
-          }}>
-          <Text style={styles.btnTextNotif}>NOTIF</Text>
-        </TouchableOpacity>
+        {notif !== 0 && (
+          <TouchableOpacity
+            style={styles.BtnNotifOn}
+            onPress={() => {
+              navigation.navigate('NotificationPage');
+            }}>
+            <Text style={styles.btnTextNotif}>Chat Pelayan</Text>
+            <Text style={styles.notif}>{notif}</Text>
+          </TouchableOpacity>
+        )}
+        {notif === 0 && (
+          <TouchableOpacity
+            style={styles.BtnNotifOff}
+            onPress={() => {
+              navigation.navigate('NotificationPage');
+            }}>
+            <Text style={styles.btnTextNotif}>Chat Pelayan</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -139,18 +195,39 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
   },
-  BtnNotif: {
-    width: wp('10%'),
+  BtnNotifOn: {
     backgroundColor: '#f39c12',
     borderRadius: hp('7%'),
-    height: hp('4.5%'),
     alignItems: 'center',
+    paddingEnd: hp('5.5%'),
+    paddingStart: hp('2%'),
     justifyContent: 'center',
     marginLeft: hp('0.5%'),
+    position: 'relative',
+  },
+  BtnNotifOff: {
+    backgroundColor: '#f39c12',
+    borderRadius: hp('7%'),
+    alignItems: 'center',
+    paddingHorizontal: hp('2%'),
+    justifyContent: 'center',
+    marginLeft: hp('0.5%'),
+    position: 'relative',
+  },
+  notif: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: hp('4%'),
+    paddingVertical: hp('0.5%'),
+    paddingHorizontal: hp('1%'),
+    fontSize: hp('1.8%'),
   },
   btnTextNotif: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: hp('1.3%'),
+    fontSize: hp('1.5%'),
   },
 });

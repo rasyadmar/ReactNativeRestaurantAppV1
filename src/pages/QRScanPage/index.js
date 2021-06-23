@@ -59,6 +59,7 @@ export default function QRScanPage({navigation}) {
       toMainPelanggan();
       console.log('asd');
     } else if (e.data === 'nariwipelayan') {
+      AsyncStorage.setItem('loginpelayan', 'udahlogin');
       regisFirebase();
       toPelayan();
     } else if (e.data === 'nariwimanagement') {

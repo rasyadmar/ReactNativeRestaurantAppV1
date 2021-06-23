@@ -19,21 +19,47 @@ import {
   increaseItemQty,
   decreaseItemQty,
 } from '../../../features/keranjangSlice';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 
-export default function ItemBelanja({idItemDiDB, namaItem, jumlahItem}) {
+export default function ItemBelanja({
+  idItemDiDB,
+  namaItem,
+  jumlahItem,
+  linkGambar,
+}) {
   const [qty, setQty] = useState(0);
+  const [urlGambar, setUrlGambar] = useState(0);
+
   useEffect(() => {
-    setQty();
+    const bootstrapAsync = async () => {
+      const url = await storage().ref(linkGambar).getDownloadURL();
+      setUrlGambar(url);
+    };
+    bootstrapAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const submit = () => {};
+  const submit = () => {
+    if (qty !== 0) {
+      firestore()
+        .collection('menu')
+        .doc(idItemDiDB)
+        .update({
+          stok: qty,
+        })
+        .then(() => {
+          console.log('stok is updated!');
+        });
+    }
+  };
 
   return (
     <View style={styles.itemContainer}>
       <Image
         source={{
-          uri: `https://icotar.com/avatar/${namaItem}.png`,
+          // uri: `https://icotar.com/avatar/${namaItem}.png`,
+          uri: urlGambar,
         }}
         style={styles.itemImage}
       />
@@ -48,9 +74,16 @@ export default function ItemBelanja({idItemDiDB, namaItem, jumlahItem}) {
             placeholder="Stok Baru..."
             placeholderTextColor="#7f8c8d"
             keyboardType="numeric"
+            onChangeText={text => setQty(text)}
           />
           <TouchableOpacity style={styles.BtnPlusMin}>
-            <Text style={styles.btnText}>Submit</Text>
+            <Text
+              style={styles.btnText}
+              onPress={() => {
+                submit();
+              }}>
+              Submit
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -72,7 +105,7 @@ const styles = StyleSheet.create({
     color: '#7f8c8d',
   },
   itemName: {
-    fontSize: hp('2.5%'),
+    fontSize: hp('2%'),
     height: hp('5%'),
     color: '#7f8c8d',
     fontWeight: 'bold',

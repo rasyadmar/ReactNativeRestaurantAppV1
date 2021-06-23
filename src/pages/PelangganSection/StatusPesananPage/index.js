@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
@@ -17,6 +18,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import ItemBelanja from './ItemBelanja';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const StatusPesananPage = ({navigation}) => {
   const [list, setList] = useState([]);
@@ -25,6 +27,15 @@ const StatusPesananPage = ({navigation}) => {
   const [namaPemesan, setNamaPemesan] = useState('');
   const [noMeja, setNoMeja] = useState('');
   const [docName, setDocName] = useState('');
+
+  const handleMassage = () => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('Status Pesanan Anda Telah DiPerbarui!');
+    });
+
+    return unsubscribe;
+  };
+
   const deleteFireData = () => {
     console.log(docName);
     firestore()
@@ -83,6 +94,7 @@ const StatusPesananPage = ({navigation}) => {
     };
     // getStorage();
     bootstrapAsync();
+    handleMassage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const currencyFormat = num => {

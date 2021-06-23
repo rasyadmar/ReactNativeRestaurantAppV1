@@ -16,116 +16,57 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import ItemStok from './ItemStok';
+import {TextInput} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
 const UpdatestokPage = () => {
-  const [list, setList] = useState([
-    {
-      id: '1',
-      item: 'Ayam Goreng',
-      jumlah: 2,
-      harga: 1000,
-      jenis: 'makanan',
-    },
-    {
-      id: '2',
-      item: 'Ayam Panggang',
-      jumlah: 3,
-      harga: 2000,
-      jenis: 'makanan',
-    },
-    {
-      id: '3',
-      item: 'Ayam Opor',
-      jumlah: 2,
-      harga: 3000,
-      jenis: 'makanan',
-    },
-    {
-      id: '4',
-      item: 'Bebek Goreng',
-      jumlah: 3,
-      harga: 1200,
-      jenis: 'makanan',
-    },
-    {
-      id: '5',
-      item: 'Bebek Panggang',
-      jumlah: 2,
-      harga: 1320,
-      jenis: 'makanan',
-    },
-    {
-      id: '6',
-      item: 'Ikan Goreng',
-      jumlah: 3,
-      harga: 1000,
-      jenis: 'makanan',
-    },
-    {
-      id: '7',
-      item: 'Ikan Bakar',
-      jumlah: 2,
-      harga: 1000,
-      jenis: 'makanan',
-    },
-    {id: '8', item: 'Sup Ikan', jumlah: 3, harga: 1000, jenis: 'makanan'},
-    {
-      id: '1',
-      item: 'Teh',
-      jumlah: 2,
-      harga: 1000,
-      jenis: 'minuman',
-    },
-    {
-      id: '2',
-      item: 'Jeruk',
-      jumlah: 3,
-      harga: 2000,
-      jenis: 'minuman',
-    },
-    {
-      id: '3',
-      item: 'Kopi',
-      jumlah: 2,
-      harga: 3000,
-      jenis: 'minuman',
-    },
-    {
-      id: '4',
-      item: 'Air Putih',
-      jumlah: 3,
-      harga: 1200,
-      jenis: 'minuman',
-    },
-    {
-      id: '5',
-      item: 'Jus Jambu',
-      jumlah: 2,
-      harga: 1320,
-      jenis: 'minuman',
-    },
-    {
-      id: '6',
-      item: 'Jus Mangga',
-      jumlah: 3,
-      harga: 1000,
-      jenis: 'minuman',
-    },
-    {
-      id: '7',
-      item: 'Jus Duren',
-      jumlah: 2,
-      harga: 1000,
-      jenis: 'minuman',
-    },
-    {id: '8', item: 'Jus Alpukat', jumlah: 3, harga: 1000, jenis: 'minuman'},
-  ]);
+  const [list, setList] = useState([]);
+  const [id, setId] = useState([]);
+  const [displayedList, setDisplayedList] = useState([]);
+  const [displayedId, setDisplayedId] = useState([]);
+
+  function onResult(querySnapshot) {
+    let listIn = [];
+    let idIn = [];
+    console.log('Getting Menu From Database');
+    querySnapshot.forEach(documentSnapshot => {
+      listIn.push(documentSnapshot.data());
+      idIn.push(documentSnapshot.id);
+    });
+    setId(idIn);
+    setDisplayedId(idIn);
+    setList(listIn);
+    setDisplayedList(listIn);
+  }
+
+  function onError(error) {
+    console.error(error);
+  }
+
+  const getFireData = () => {
+    firestore().collection('menu').onSnapshot(onResult, onError);
+  };
   useEffect(() => {
-    // getMenu();
-    // getMinuman();
-    // combine();
+    getFireData();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const filteringList = filter => {
+    let newList = [];
+    let newIdList = [];
+    list.map((item, i) => {
+      if (item.nama.toUpperCase() === filter.toUpperCase()) {
+        newList.push(item);
+        newIdList.push(id[i]);
+      }
+    });
+    if (newList.length === 0) {
+      newList.push(...list);
+      newIdList.push(...id);
+    }
+    setDisplayedList(newList);
+    setDisplayedId(newIdList);
+  };
   const getMenu = () => {
     axios.get('http://0.0.0.0:3000/MenuSemua').then(res => {
       setList(res.data);
@@ -139,14 +80,24 @@ const UpdatestokPage = () => {
         <Image style={styles.headerlogo} source={logo} />
       </View>
       <Text style={styles.title}>Update Stok</Text>
+      <View style={styles.inputView}>
+        <TextInput
+          style={styles.inputText}
+          placeholder="Cari Menu..."
+          placeholderTextColor="#7f8c8d"
+          onChangeText={text => {
+            filteringList(text);
+          }}></TextInput>
+      </View>
       <ScrollView vertical>
-        {list.map((item, i) => {
+        {displayedList.map((item, i) => {
           return (
             <ItemStok
-              key={item.id}
-              idItemDiDB={item.id}
-              namaItem={item.item}
-              jumlahItem={item.jumlah}
+              key={displayedId[i]}
+              idItemDiDB={displayedId[i]}
+              namaItem={item.nama}
+              jumlahItem={item.stok}
+              linkGambar={item.linkGambar}
             />
           );
         })}
@@ -209,5 +160,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
+  },
+  inputView: {
+    width: wp('80%'),
+    backgroundColor: '#ecf0f1',
+    borderRadius: hp('4%'),
+    height: hp('7%'),
+    marginBottom: hp('2%'),
+    justifyContent: 'center',
+    padding: 20,
+    alignSelf: 'center',
+  },
+  inputText: {
+    height: hp('7%'),
+    color: '#7f8c8d',
   },
 });

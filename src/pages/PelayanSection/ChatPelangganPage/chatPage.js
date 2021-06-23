@@ -1,36 +1,29 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-} from 'react-native';
-import header from '../../../assets/image/headerflip.jpeg';
-import logo from '../../../assets/image/img_logo.jpeg';
+import {TouchableOpacity} from 'react-native';
+import {ScrollView} from 'react-native';
+import {StyleSheet, Text, Image, View, TextInput} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {useEffect, useState, useRef} from 'react/cjs/react.development';
+import header from '../../../assets/image/headerflip.jpeg';
+import logo from '../../../assets/image/img_logo.jpeg';
 import firestore from '@react-native-firebase/firestore';
-import ItemChatInside from './itemChatInside.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import ItemChatInside from './itemChatInside';
 
-const NotificationPage = () => {
+const ChatPage = ({route}) => {
+  const {namaPelanggan, nomorMeja} = route.params;
   const [chatList, setChatList] = useState([]);
-  const [itemId, setItemId] = useState('');
-  const [bolChat, setBolChat] = useState(false);
   const scrollViewRef = useRef();
+  const [itemId, setItemId] = useState('');
   const [inputText, setInputText] = useState('');
 
   function onResult(querySnapshot) {
     let id;
     let listIn = [];
+    console.log('download the chat data');
     querySnapshot.forEach(documentSnapshot => {
-      console.log(documentSnapshot.data().pesan);
       setChatList(documentSnapshot.data().pesan);
       listIn = documentSnapshot.data().pesan;
       id = documentSnapshot.id;
@@ -40,7 +33,7 @@ const NotificationPage = () => {
       .collection('chatlog')
       .doc(id)
       .update({
-        readPelanggan: listIn,
+        readPelayan: listIn,
       })
       .then(() => {});
   }
@@ -48,29 +41,14 @@ const NotificationPage = () => {
   function onError(error) {
     console.error(error);
   }
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      let nama;
-      let nomeja;
-      try {
-        nama = await AsyncStorage.getItem('namaPemesan');
-        nomeja = await AsyncStorage.getItem('nomorMeja');
-      } catch (e) {
-      } finally {
-        // setNamaPemesan(nama);
-        // setNoMeja(nomeja);
-        console.log('get chat');
-        firestore()
-          .collection('chatlog')
-          .where('meja', '==', nomeja)
-          .where('pemesan', '==', nama)
-          .onSnapshot(onResult, onError);
-      }
-    };
-    // getStorage();
-    bootstrapAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+  const getFireChat = () => {
+    firestore()
+      .collection('chatlog')
+      .where('meja', '==', nomorMeja)
+      .where('pemesan', '==', namaPelanggan)
+      .onSnapshot(onResult, onError);
+  };
 
   const getTodayTimeDate = () => {
     let today = new Date();
@@ -88,7 +66,7 @@ const NotificationPage = () => {
   const updateChat = text => {
     let dateTime = getTodayTimeDate();
     chatList.push({
-      pengirim: 'pelanggan',
+      pengirim: 'pelayan',
       pesan: text,
       waktu: dateTime[0],
       tanggal: dateTime[1],
@@ -103,8 +81,13 @@ const NotificationPage = () => {
     setInputText('');
   };
 
+  useEffect(() => {
+    getFireChat();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <View style={{backgroundColor: '#fff', flex: 1}}>
+    <View style={{backgroundColor: '#fff', flex: 1, padding: hp('1%')}}>
       <View style={styles.header}>
         <Image style={styles.headerImage} source={header} />
         <Image style={styles.headerlogo} source={logo} />
@@ -136,21 +119,19 @@ const NotificationPage = () => {
           onChangeText={text => {
             setInputText(text);
           }}></TextInput>
-        <TouchableOpacity style={styles.BtnSend}>
-          <Text
-            style={styles.btnText}
-            onPress={() => {
-              updateChat(inputText);
-            }}>
-            Kirim
-          </Text>
+        <TouchableOpacity
+          style={styles.BtnSend}
+          onPress={() => {
+            updateChat(inputText);
+          }}>
+          <Text style={styles.btnText}>Kirim</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export default NotificationPage;
+export default ChatPage;
 
 const styles = StyleSheet.create({
   itemData: {marginStart: wp('5%'), flex: 1},

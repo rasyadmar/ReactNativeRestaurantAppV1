@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {TextInput} from 'react-native';
+import {TextInput, Alert} from 'react-native';
 import {StyleSheet, ToastAndroid, Text, View, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Rating, AirbnbRating} from 'react-native-ratings';
@@ -11,12 +11,21 @@ import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const GiveReviewPage = ({navigation}) => {
   const [rating, setRating] = useState(0);
   const [komentar, setKomentar] = useState('');
   const [namaPemesan, setNamaPemesan] = useState('');
   const [noMeja, setNoMeja] = useState('');
+
+  const handleMassage = () => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('Status Pesanan Anda Telah DiPerbarui!');
+    });
+
+    return unsubscribe;
+  };
 
   const submitReview = () => {
     if (rating === 0 || komentar === '') {
@@ -78,6 +87,7 @@ const GiveReviewPage = ({navigation}) => {
       setNoMeja(nomeja);
     };
     bootstrapAsync();
+    handleMassage();
   }, []);
   return (
     <View style={styles.container}>

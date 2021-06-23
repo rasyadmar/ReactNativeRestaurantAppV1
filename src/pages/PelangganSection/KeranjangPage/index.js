@@ -35,6 +35,14 @@ const KeranjangPage = ({navigation}) => {
   const [token, setToken] = useState('');
   let keranjang = useSelector(selectKeranjang);
 
+  const handleMassage = () => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('Status Pesanan Anda Telah DiPerbarui!');
+    });
+
+    return unsubscribe;
+  };
+
   const cekHarga = items => {
     let harga = 0;
     if (items.length) {
@@ -64,6 +72,7 @@ const KeranjangPage = ({navigation}) => {
       .then(token => {
         setToken(token);
       });
+    handleMassage();
   }, [keranjang]);
 
   const currencyFormat = num => {

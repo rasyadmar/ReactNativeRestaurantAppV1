@@ -4,8 +4,19 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {useEffect, useState} from 'react/cjs/react.development';
+import storage from '@react-native-firebase/storage';
 
-const ItemDetail = ({namaItem, jumlahItem, hargaItem}) => {
+const ItemDetail = ({namaItem, jumlahItem, hargaItem, linkGambar}) => {
+  const [urlGambar, setUrlGambar] = useState('');
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      const url = await storage().ref(linkGambar).getDownloadURL();
+      setUrlGambar(url);
+    };
+    bootstrapAsync();
+  });
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
@@ -13,16 +24,13 @@ const ItemDetail = ({namaItem, jumlahItem, hargaItem}) => {
     <View style={styles.itemContainer}>
       <Image
         source={{
-          uri: `https://icotar.com/avatar/${namaItem}.png`,
+          uri: urlGambar,
         }}
         style={styles.itemImage}
       />
       <View style={styles.itemData}>
         <Text style={styles.itemName}>{namaItem}</Text>
         <Text style={styles.itemJumlah}>Jumlah: {jumlahItem}</Text>
-        <Text style={styles.itemJumlah}>
-          Harga: {currencyFormat(hargaItem)}
-        </Text>
       </View>
       <View>
         <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>Total: </Text>
@@ -32,7 +40,7 @@ const ItemDetail = ({namaItem, jumlahItem, hargaItem}) => {
             color: '#f39c12',
             fontSize: hp('2.5%'),
           }}>
-          {currencyFormat(hargaItem * jumlahItem)}
+          {currencyFormat(hargaItem)}
         </Text>
       </View>
     </View>

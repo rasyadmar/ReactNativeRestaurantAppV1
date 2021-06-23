@@ -8,75 +8,49 @@ import {useState, useEffect} from 'react/cjs/react.development';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
 import ItemPesanan from './itemPesanan';
-
-let dummyPesanan = [
-  {
-    id: 1,
-    namaPelanggan: 'Budi',
-    nomorMeja: '12a',
-    pesanan: [
-      {namaPesanan: 'Nila Bakar', jumlahPesanan: 2, hargaItem: 1000},
-      {namaPesanan: 'Nila Asam Manis', jumlahPesanan: 1, hargaItem: 1000},
-      {namaPesanan: 'Es Teh Manis', jumlahPesanan: 4, hargaItem: 100},
-      {namaPesanan: 'Nasi Putih', jumlahPesanan: 4, hargaItem: 100},
-    ],
-    totalHarga: 10000,
-    status: 'Belum',
-  },
-  {
-    id: 2,
-    namaPelanggan: 'Maman',
-    nomorMeja: '13a',
-    pesanan: [
-      {namaPesanan: 'Nila Bakar', jumlahPesanan: 2, hargaItem: 1000},
-      {namaPesanan: 'Nila Asam Manis', jumlahPesanan: 1, hargaItem: 1000},
-      {namaPesanan: 'Es Teh Manis', jumlahPesanan: 4, hargaItem: 100},
-      {namaPesanan: 'Nasi Putih', jumlahPesanan: 4, hargaItem: 100},
-    ],
-    totalHarga: 10000,
-    status: 'Belum',
-  },
-  {
-    id: 3,
-    namaPelanggan: 'Rifki',
-    nomorMeja: '14a',
-    pesanan: [
-      {namaPesanan: 'Nila Bakar', jumlahPesanan: 2, hargaItem: 1000},
-      {namaPesanan: 'Nila Asam Manis', jumlahPesanan: 1, hargaItem: 1000},
-      {namaPesanan: 'Es Teh Manis', jumlahPesanan: 4, hargaItem: 100},
-      {namaPesanan: 'Nasi Putih', jumlahPesanan: 4, hargaItem: 100},
-    ],
-    totalHarga: 10000,
-    status: 'Belum',
-  },
-  {
-    id: 4,
-    namaPelanggan: 'Lail',
-    nomorMeja: '15a',
-    pesanan: [
-      {namaPesanan: 'Nila Bakar', jumlahPesanan: 2, hargaItem: 1000},
-      {namaPesanan: 'Nila Asam Manis', jumlahPesanan: 1, hargaItem: 1000},
-      {namaPesanan: 'Es Teh Manis', jumlahPesanan: 4, hargaItem: 100},
-      {namaPesanan: 'Nasi Putih', jumlahPesanan: 4, hargaItem: 100},
-    ],
-    totalHarga: 10000,
-    status: 'Belum',
-  },
-];
+import firestore from '@react-native-firebase/firestore';
 
 const DaftarPesananPage = ({navigation}) => {
   const [list, setList] = useState([]);
+  const [idItem, setIdItem] = useState([]);
+
+  function onResult(querySnapshot) {
+    let listGet = [];
+    let listId = [];
+    querySnapshot.forEach(documentSnapshot => {
+      listGet.push(documentSnapshot.data());
+      listId.push(documentSnapshot.id);
+    });
+    setList(listGet);
+    setIdItem(listId);
+  }
+
+  function onError(error) {
+    console.error(error);
+  }
+
+  const getFireData = () => {
+    firestore().collection('pesanan').onSnapshot(onResult, onError);
+  };
+
   useEffect(() => {
-    setList(dummyPesanan);
+    getFireData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const DetailFunction = (namaPelanggan, nomorMeja, pesanan, totalHarga) => {
+  const DetailFunction = (
+    namaPelanggan,
+    nomorMeja,
+    idItem,
+    pesanan,
+    totalharga,
+  ) => {
     navigation.navigate('DetailPelanggan', {
       namaPelanggan: namaPelanggan,
       nomorMeja: nomorMeja,
+      idItem: idItem,
       pesanan: pesanan,
-      totalHarga: totalHarga,
+      totalHarga: totalharga,
     });
   };
 
@@ -88,17 +62,19 @@ const DaftarPesananPage = ({navigation}) => {
       </View>
       <Text style={styles.title}>Daftar Pesanan Pelanggan</Text>
       <ScrollView vertical>
-        {list.map(item => {
+        {list.map((item, i) => {
           return (
             <ItemPesanan
-              key={item.id}
-              namaPelanggan={item.namaPelanggan}
-              nomorMeja={item.nomorMeja}
-              status={item.status}
+              key={idItem[i]}
+              idItem={idItem[i]}
+              namaPelanggan={item.pemesan}
+              nomorMeja={item.meja}
+              status={item.progress}
               detailFunction={() =>
                 DetailFunction(
-                  item.namaPelanggan,
-                  item.nomorMeja,
+                  item.pemesan,
+                  item.meja,
+                  idItem[i],
                   item.pesanan,
                   item.totalHarga,
                 )

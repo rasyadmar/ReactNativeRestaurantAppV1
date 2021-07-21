@@ -20,35 +20,53 @@ import ItemChatInside from './itemChatInside.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NotificationPage = () => {
-  const [chatList, setChatList] = useState([]);
-  const [itemId, setItemId] = useState('');
-  const [bolChat, setBolChat] = useState(false);
-  const scrollViewRef = useRef();
-  const [inputText, setInputText] = useState('');
+  const [chatList, setChatList] = React.useState([]);
+  const [itemId, setItemId] = React.useState('');
+  const [bolChat, setBolChat] = React.useState(false);
+  const scrollViewRef = React.useRef();
+  const [inputText, setInputText] = React.useState('');
+  const [namaPelanggan, setNamaPelanggan] = React.useState('');
+  const [noMeja, setNoMeja] = React.useState('');
 
   function onResult(querySnapshot) {
     let id;
     let listIn = [];
-    querySnapshot.forEach(documentSnapshot => {
-      console.log(documentSnapshot.data().pesan);
-      setChatList(documentSnapshot.data().pesan);
-      listIn = documentSnapshot.data().pesan;
-      id = documentSnapshot.id;
-      setItemId(id);
-    });
-    firestore()
-      .collection('chatlog')
-      .doc(id)
-      .update({
-        readPelanggan: listIn,
-      })
-      .then(() => {});
+    if (querySnapshot.size !== 0) {
+      setBolChat(true);
+      querySnapshot.forEach(documentSnapshot => {
+        // console.log(documentSnapshot.data().pesan);
+        setChatList(documentSnapshot.data().pesan);
+        listIn = documentSnapshot.data().pesan;
+        id = documentSnapshot.id;
+        setItemId(id);
+      });
+      firestore()
+        .collection('chatlog')
+        .doc(id)
+        .update({
+          readPelanggan: listIn,
+        })
+        .then(() => {});
+    } else {
+      setBolChat(false);
+    }
   }
+
+  const realTimeGetFire = (nama, nomeja) => {
+    console.log('masuk realtime get fire');
+    const unSubscribe = firestore()
+      .collection('chatlog')
+      .where('meja', '==', nomeja)
+      .where('pemesan', '==', nama)
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
+  };
 
   function onError(error) {
     console.error(error);
   }
-  useEffect(() => {
+  React.useEffect(() => {
+    let unSubscribe;
     const bootstrapAsync = async () => {
       let nama;
       let nomeja;
@@ -60,15 +78,16 @@ const NotificationPage = () => {
         // setNamaPemesan(nama);
         // setNoMeja(nomeja);
         console.log('get chat');
-        firestore()
-          .collection('chatlog')
-          .where('meja', '==', nomeja)
-          .where('pemesan', '==', nama)
-          .onSnapshot(onResult, onError);
+        setNamaPelanggan(nama);
+        setNoMeja(nomeja);
+        unSubscribe = realTimeGetFire(nama, nomeja);
       }
     };
-    // getStorage();
     bootstrapAsync();
+    return () => {
+      unSubscribe();
+    };
+    // getStorage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -93,13 +112,26 @@ const NotificationPage = () => {
       waktu: dateTime[0],
       tanggal: dateTime[1],
     });
-    firestore()
-      .collection('chatlog')
-      .doc(itemId)
-      .update({
-        pesan: chatList,
-      })
-      .then(() => {});
+    if (bolChat) {
+      firestore()
+        .collection('chatlog')
+        .doc(itemId)
+        .update({
+          pesan: chatList,
+        })
+        .then(() => {});
+    } else {
+      firestore()
+        .collection('chatlog')
+        .add({
+          meja: noMeja,
+          pemesan: namaPelanggan,
+          pesan: chatList,
+          readPelanggan: [],
+          readPelayan: [],
+        })
+        .then(() => {});
+    }
     setInputText('');
   };
 
@@ -136,14 +168,12 @@ const NotificationPage = () => {
           onChangeText={text => {
             setInputText(text);
           }}></TextInput>
-        <TouchableOpacity style={styles.BtnSend}>
-          <Text
-            style={styles.btnText}
-            onPress={() => {
-              updateChat(inputText);
-            }}>
-            Kirim
-          </Text>
+        <TouchableOpacity
+          style={styles.BtnSend}
+          onPress={() => {
+            updateChat(inputText);
+          }}>
+          <Text style={styles.btnText}>Kirim</Text>
         </TouchableOpacity>
       </View>
     </View>

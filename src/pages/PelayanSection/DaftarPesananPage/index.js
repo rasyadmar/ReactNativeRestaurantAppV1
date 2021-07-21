@@ -11,8 +11,63 @@ import ItemPesanan from './itemPesanan';
 import firestore from '@react-native-firebase/firestore';
 
 const DaftarPesananPage = ({navigation}) => {
-  const [list, setList] = useState([]);
-  const [idItem, setIdItem] = useState([]);
+  const [listBelum, setListBelum] = React.useState([]);
+  const [idBelum, setIdBelum] = React.useState([]);
+  const [listSedang, setListSedang] = React.useState([]);
+  const [idSedang, setIdSedang] = React.useState([]);
+  const [listAntar, setListAntar] = React.useState([]);
+  const [idAntar, setIdAntar] = React.useState([]);
+  const [listSampai, setListSampai] = React.useState([]);
+  const [idSampai, setIdSampai] = React.useState([]);
+  const [listBayar, setListBayar] = React.useState([]);
+  const [idBayar, setIdBayar] = React.useState([]);
+
+  const filterPesananByStatus = (listGetIn, listIdIn, status) => {
+    let filteredPesanan = [];
+    let filteredId = [];
+    listGetIn.map((item, i) => {
+      if (item.progress === status) {
+        filteredPesanan.push(item);
+        filteredId.push(listIdIn[i]);
+      }
+    });
+    return [filteredPesanan, filteredId];
+  };
+
+  const getPesananByStatus = (listGetIn, listIdIn) => {
+    let belumList = filterPesananByStatus(
+      listGetIn,
+      listIdIn,
+      'Belum Di Proses',
+    );
+    let sedangList = filterPesananByStatus(
+      listGetIn,
+      listIdIn,
+      'Sedang Di Proses',
+    );
+    let antarList = filterPesananByStatus(
+      listGetIn,
+      listIdIn,
+      'Sedang Di Antar',
+    );
+    let sampaiList = filterPesananByStatus(listGetIn, listIdIn, 'Sampai');
+    let bayarList = filterPesananByStatus(listGetIn, listIdIn, 'Bayar');
+
+    setListBelum(belumList[0]);
+    setIdBelum(belumList[1]);
+
+    setListSedang(sedangList[0]);
+    setIdSedang(sedangList[1]);
+
+    setListAntar(antarList[0]);
+    setIdAntar(antarList[1]);
+
+    setListSampai(sampaiList[0]);
+    setIdSampai(sampaiList[1]);
+
+    setListBayar(bayarList[0]);
+    setIdBayar(bayarList[1]);
+  };
 
   function onResult(querySnapshot) {
     let listGet = [];
@@ -21,8 +76,7 @@ const DaftarPesananPage = ({navigation}) => {
       listGet.push(documentSnapshot.data());
       listId.push(documentSnapshot.id);
     });
-    setList(listGet);
-    setIdItem(listId);
+    getPesananByStatus(listGet, listId);
   }
 
   function onError(error) {
@@ -30,27 +84,25 @@ const DaftarPesananPage = ({navigation}) => {
   }
 
   const getFireData = () => {
-    firestore().collection('pesanan').onSnapshot(onResult, onError);
+    const unSubscribe = firestore()
+      .collection('pesanan')
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
   };
 
-  useEffect(() => {
-    getFireData();
+  React.useEffect(() => {
+    let unSubscribe = getFireData();
+    return () => {
+      unSubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const DetailFunction = (
-    namaPelanggan,
-    nomorMeja,
-    idItem,
-    pesanan,
-    totalharga,
-  ) => {
+  const DetailFunction = (namaPelanggan, nomorMeja, idItem) => {
     navigation.navigate('DetailPelanggan', {
       namaPelanggan: namaPelanggan,
       nomorMeja: nomorMeja,
       idItem: idItem,
-      pesanan: pesanan,
-      totalHarga: totalharga,
     });
   };
 
@@ -62,22 +114,77 @@ const DaftarPesananPage = ({navigation}) => {
       </View>
       <Text style={styles.title}>Daftar Pesanan Pelanggan</Text>
       <ScrollView vertical>
-        {list.map((item, i) => {
+        <Text style={styles.type}>Belum Di Proses</Text>
+        {listBelum.map((item, i) => {
           return (
             <ItemPesanan
-              key={idItem[i]}
-              idItem={idItem[i]}
+              key={idBelum[i]}
+              idItem={idBelum[i]}
               namaPelanggan={item.pemesan}
               nomorMeja={item.meja}
               status={item.progress}
               detailFunction={() =>
-                DetailFunction(
-                  item.pemesan,
-                  item.meja,
-                  idItem[i],
-                  item.pesanan,
-                  item.totalHarga,
-                )
+                DetailFunction(item.pemesan, item.meja, idBelum[i])
+              }
+            />
+          );
+        })}
+        <Text style={styles.type}>Sedang Di Proses</Text>
+        {listSedang.map((item, i) => {
+          return (
+            <ItemPesanan
+              key={idSedang[i]}
+              idItem={idSedang[i]}
+              namaPelanggan={item.pemesan}
+              nomorMeja={item.meja}
+              status={item.progress}
+              detailFunction={() =>
+                DetailFunction(item.pemesan, item.meja, idSedang[i])
+              }
+            />
+          );
+        })}
+        <Text style={styles.type}>Sedang Di Antar</Text>
+        {listAntar.map((item, i) => {
+          return (
+            <ItemPesanan
+              key={idAntar[i]}
+              idItem={idAntar[i]}
+              namaPelanggan={item.pemesan}
+              nomorMeja={item.meja}
+              status={item.progress}
+              detailFunction={() =>
+                DetailFunction(item.pemesan, item.meja, idAntar[i])
+              }
+            />
+          );
+        })}
+        <Text style={styles.type}>Sampai Ke Meja</Text>
+        {listSampai.map((item, i) => {
+          return (
+            <ItemPesanan
+              key={idSampai[i]}
+              idItem={idSampai[i]}
+              namaPelanggan={item.pemesan}
+              nomorMeja={item.meja}
+              status={item.progress}
+              detailFunction={() =>
+                DetailFunction(item.pemesan, item.meja, idSampai[i])
+              }
+            />
+          );
+        })}
+        <Text style={styles.type}>Siap Bayar</Text>
+        {listBayar.map((item, i) => {
+          return (
+            <ItemPesanan
+              key={idBayar[i]}
+              idItem={idBayar[i]}
+              namaPelanggan={item.pemesan}
+              nomorMeja={item.meja}
+              status={item.progress}
+              detailFunction={() =>
+                DetailFunction(item.pemesan, item.meja, idBayar[i])
               }
             />
           );
@@ -136,5 +243,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
+  },
+  type: {
+    margin: hp('1%'),
+    padding: hp('1%'),
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(127, 140, 141,0.1)',
+    fontSize: hp('2.5%'),
+    color: '#7f8c8d',
   },
 });

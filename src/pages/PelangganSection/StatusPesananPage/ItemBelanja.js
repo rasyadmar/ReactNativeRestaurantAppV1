@@ -25,8 +25,8 @@ export default function ItemBelanja({
 }) {
   const dispatch = useDispatch();
   const keranjang = useSelector(selectKeranjang);
-  const [qty, setQty] = useState(0);
-  const [urlGambar, setUrlGambar] = useState('');
+  const [qty, setQty] = React.useState(0);
+  const [urlGambar, setUrlGambar] = React.useState('');
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
@@ -40,7 +40,7 @@ export default function ItemBelanja({
       });
     }
   };
-  useEffect(() => {
+  React.useEffect(() => {
     // checkKeranjang();
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
@@ -49,7 +49,7 @@ export default function ItemBelanja({
     };
     bootstrapAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [linkGambar]);
 
   return (
     <View style={styles.itemContainer}>

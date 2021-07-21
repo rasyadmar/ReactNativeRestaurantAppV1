@@ -25,24 +25,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
 const MakananPage = ({navigation}) => {
-  const [list, setList] = useState([]);
-  const [listAsia, setListAsia] = useState([]);
-  const [idItemAsia, setIdItemAsia] = useState([]);
-  const [listChinese, setListChinese] = useState([]);
-  const [idItemChinese, setIdItemChinese] = useState([]);
-  const [listSea, setListSea] = useState([]);
-  const [idItemSea, setIdItemSea] = useState([]);
-  const [listMieSnack, setListMieSnack] = useState([]);
-  const [idItemMieSnack, setIdItemMieSnack] = useState([]);
-  const [listSundanese, setListSudanese] = useState([]);
-  const [idItemSundanese, setIdItemSundanese] = useState([]);
-  const [listKorean, setListKorean] = useState([]);
-  const [idItemKorean, setIdItemKorean] = useState([]);
-  const [idItem, setIdItem] = useState([]);
-  const [totalHarga, setTotalHarga] = useState(0);
-  const [statusPesan, setStatusPesan] = useState('');
+  const [list, setList] = React.useState([]);
+  const [listAsia, setListAsia] = React.useState([]);
+  const [idItemAsia, setIdItemAsia] = React.useState([]);
+  const [listChinese, setListChinese] = React.useState([]);
+  const [idItemChinese, setIdItemChinese] = React.useState([]);
+  const [listSea, setListSea] = React.useState([]);
+  const [idItemSea, setIdItemSea] = React.useState([]);
+  const [listMieSnack, setListMieSnack] = React.useState([]);
+  const [idItemMieSnack, setIdItemMieSnack] = React.useState([]);
+  const [listSundanese, setListSudanese] = React.useState([]);
+  const [idItemSundanese, setIdItemSundanese] = React.useState([]);
+  const [listKorean, setListKorean] = React.useState([]);
+  const [idItemKorean, setIdItemKorean] = React.useState([]);
+  const [idItem, setIdItem] = React.useState([]);
+  const [totalHarga, setTotalHarga] = React.useState(0);
+  const [statusPesan, setStatusPesan] = React.useState('');
   const keranjang = useSelector(selectKeranjang);
-  const [once, setOnce] = useState(0);
+  const [once, setOnce] = React.useState(0);
 
   const handleMassage = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -147,7 +147,7 @@ const MakananPage = ({navigation}) => {
       });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     console.log(once);
     if (once === 0) {
       const bootstrapAsync = async () => {
@@ -282,22 +282,17 @@ const MakananPage = ({navigation}) => {
             {currencyFormat(totalHarga)}
           </Text>
         </Text>
-        {statusPesan === 'belum' && (
-          <TouchableOpacity style={styles.Btn}>
-            <Text
-              style={styles.btnText}
-              onPress={() => {
-                navigation.navigate('KeranjangPelanggan');
-              }}>
-              Cek Keranjang
-            </Text>
-          </TouchableOpacity>
-        )}
-        {statusPesan === 'sudah' && (
-          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>
-            Sudah Memesan
+        <TouchableOpacity style={styles.Btn}>
+          <Text
+            style={styles.btnText}
+            onPress={() => {
+              navigation.navigate('KeranjangPelanggan', {
+                statusPesan: statusPesan,
+              });
+            }}>
+            Cek Keranjang
           </Text>
-        )}
+        </TouchableOpacity>
       </View>
     </View>
   );

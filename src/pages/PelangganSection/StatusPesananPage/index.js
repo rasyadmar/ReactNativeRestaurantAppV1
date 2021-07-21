@@ -19,14 +19,17 @@ import firestore from '@react-native-firebase/firestore';
 import ItemBelanja from './ItemBelanja';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import SectionStatus from './SectionStatus';
 
 const StatusPesananPage = ({navigation}) => {
-  const [list, setList] = useState([]);
-  const [totalHarga, setTotalHarga] = useState(0);
-  const [progress, setProgress] = useState('');
-  const [namaPemesan, setNamaPemesan] = useState('');
-  const [noMeja, setNoMeja] = useState('');
-  const [docName, setDocName] = useState('');
+  const [list, setList] = React.useState([]);
+  const [listCatatan, setListCatatan] = React.useState([]);
+  const [listStatus, setListStatus] = React.useState([]);
+  const [totalHarga, setTotalHarga] = React.useState(0);
+  const [progress, setProgress] = React.useState('');
+  // const [namaPemesan, setNamaPemesan] = React.useState('');
+  // const [noMeja, setNoMeja] = React.useState('');
+  const [docName, setDocName] = React.useState('');
 
   const handleMassage = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -36,6 +39,39 @@ const StatusPesananPage = ({navigation}) => {
     return unsubscribe;
   };
 
+  const returnStockWhenCancle = (menuName, returnedStok) => {
+    let currentStok;
+    firestore()
+      .collection('menu')
+      .doc(menuName)
+      .get()
+      .then(querySnapshot => {
+        currentStok = querySnapshot.data().stok;
+        firestore()
+          .collection('menu')
+          .doc(menuName)
+          .update({
+            stok: currentStok + returnedStok,
+          })
+          .then(() => {
+            console.log(menuName + ' stock successfully returned');
+          });
+      });
+  };
+
+  const getReturnedStockValue = pesananKe => {
+    let namaPesanan = [];
+    let stokReturned = [];
+    list.map(item => {
+      if (item.pesananKe === pesananKe) {
+        stokReturned.push(item.jumlah);
+        let namaNoSpasi = item.namaPesanan.replace(/ /g, '');
+        namaPesanan.push(namaNoSpasi);
+      }
+    });
+    return [namaPesanan, stokReturned];
+  };
+
   const deleteFireData = () => {
     console.log(docName);
     firestore()
@@ -43,15 +79,111 @@ const StatusPesananPage = ({navigation}) => {
       .doc(docName)
       .delete()
       .then(() => {
-        AsyncStorage.setItem('statusPesan', 'belum');
+        // AsyncStorage.setItem('statusPesan', 'belum');
+        console.log('delete all pesanan successed');
         navigation.navigate('MenuPelanggan');
       });
   };
-  const changeProgress = () => {
+
+  function getUnique(array) {
+    var uniqueArray = [];
+
+    for (let i = 0; i < array.length; i++) {
+      if (uniqueArray.indexOf(array[i]) === -1) {
+        uniqueArray.push(array[i]);
+      }
+    }
+    return uniqueArray;
+  }
+
+  const deleteBasedOnPesananKe = index => {
+    let [returnedPesanan, returnedJumlah] = getReturnedStockValue(index + 1);
+
+    returnedPesanan.map((item, i) => {
+      returnStockWhenCancle(item, returnedJumlah[i]);
+    });
+
+    let listCatatanIn = listCatatan;
+    listCatatanIn.splice(index, 1);
+
+    let listStatusIn = listStatus;
+    listStatusIn.splice(index, 1);
+
+    let deletedCost = 0;
+    let pesananYangTersisa = [];
+    list.map(item => {
+      if (item.pesananKe === index + 1) {
+        deletedCost = deletedCost + item.totalHarga;
+      } else {
+        pesananYangTersisa.push(item.pesananKe);
+      }
+    });
+    let pesananYangTersisaUnik = getUnique(pesananYangTersisa);
+
+    let listPesananIn = list.filter(obj => {
+      return obj.pesananKe !== index + 1;
+    });
+    console.log(listPesananIn);
+    let pesananKeBaru = 1;
+    pesananYangTersisaUnik.map(item => {
+      listPesananIn.map(itemIN => {
+        if (item === itemIN.pesananKe) {
+          itemIN.pesananKe = pesananKeBaru;
+        }
+      });
+      pesananKeBaru++;
+    });
+    // console.log(listPesananIn);
+    if (listCatatan.length === 0) {
+      deleteFireData();
+    } else {
+      firestore()
+        .collection('pesanan')
+        .doc(docName)
+        .update({
+          pesanan: listPesananIn,
+          listStatus: listStatusIn,
+          catatan: listCatatanIn,
+          pesananKe: listCatatan.length,
+          totalHarga: totalHarga - deletedCost,
+        })
+        .then(() => {
+          console.log('delete based on pesanan ke successed');
+          //mengembalikan stok ke tabel menu
+        });
+    }
+  };
+
+  const changeSampaiPerPesanan = indexStatus => {
+    let listStatusSampaiIN = [];
+    listStatus.map((item, i) => {
+      if (i === indexStatus) {
+        listStatusSampaiIN.push('Sampai');
+      } else {
+        listStatusSampaiIN.push(item);
+      }
+    });
     firestore()
       .collection('pesanan')
       .doc(docName)
       .update({
+        listStatus: listStatusSampaiIN,
+      })
+      .then(() => {
+        console.log('ListStatus is updated');
+      });
+  };
+
+  const changeProgressToBayar = () => {
+    let bayarList = [];
+    listStatus.map(item => {
+      bayarList.push('Bayar');
+    });
+    firestore()
+      .collection('pesanan')
+      .doc(docName)
+      .update({
+        listStatus: bayarList,
         progress: 'Bayar',
       })
       .then(() => {
@@ -59,13 +191,72 @@ const StatusPesananPage = ({navigation}) => {
         navigation.navigate('GiveReviewPage');
       });
   };
+
+  const getPesananData = pesananKe => {
+    let pesananIn = [];
+
+    list.map(item => {
+      if (item.pesananKe === pesananKe) {
+        pesananIn.push(item);
+      }
+    });
+    return pesananIn;
+  };
+
+  const updateProgressFire = progress => {
+    firestore()
+      .collection('pesanan')
+      .doc(docName)
+      .update({
+        progress: progress,
+      })
+      .then(() => {
+        console.log('by pelanggan progress is updated to ' + progress);
+      });
+  };
+  const cekStatusPesanan = listStatusIN => {
+    let countSampai = 0;
+    // let sedang = false;
+    // let diantar = false;
+    for (let i = 0; i < listStatusIN.length; i++) {
+      // if (listStatusIN[i] === 'Belum Di Proses') {
+      //   sedang = false;
+      //   diantar = false;
+      //   updateProgressFire('Belum Di Proses');
+      //   break;
+      // } else if (listStatusIN[i] === 'Sedang Di Proses') {
+      //   diantar = false;
+      //   sedang = true;
+      // } else if (listStatusIN[i] === 'Sedang Di Antar') {
+      //   diantar = true;
+      if (listStatusIN[i] === 'Sampai') {
+        countSampai++;
+      }
+    }
+    if (countSampai === listStatusIN.length) {
+      updateProgressFire('Sampai');
+      // sedang = false;
+      // diantar = false;
+    }
+    // if (sedang) {
+    //   updateProgressFire('Sedang Di Proses');
+    // } else if (diantar) {
+    //   updateProgressFire('Diantar');
+    // }
+  };
+
   function onResult(querySnapshot) {
     querySnapshot.forEach(documentSnapshot => {
-      console.log(documentSnapshot);
+      // console.log(documentSnapshot);
+      console.log('get Status pesanan data');
+      // console.log(documentSnapshot.data().pesanan);
       setList(documentSnapshot.data().pesanan);
       setDocName(documentSnapshot.id);
       setTotalHarga(documentSnapshot.data().totalHarga);
       setProgress(documentSnapshot.data().progress);
+      setListCatatan(documentSnapshot.data().catatan);
+      setListStatus(documentSnapshot.data().listStatus);
+      cekStatusPesanan(documentSnapshot.data().listStatus);
     });
   }
 
@@ -73,7 +264,17 @@ const StatusPesananPage = ({navigation}) => {
     console.error(error);
   }
 
-  useEffect(() => {
+  const realtimeGetFire = (nama, nomeja) => {
+    const unSubscribe = firestore()
+      .collection('pesanan')
+      .where('meja', '==', nomeja)
+      .where('pemesan', '==', nama)
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
+  };
+
+  React.useEffect(() => {
+    let unSubscribe;
     const bootstrapAsync = async () => {
       let nama;
       let nomeja;
@@ -82,19 +283,18 @@ const StatusPesananPage = ({navigation}) => {
         nomeja = await AsyncStorage.getItem('nomorMeja');
       } catch (e) {
       } finally {
-        setNamaPemesan(nama);
-        setNoMeja(nomeja);
+        // setNamaPemesan(nama);
+        // setNoMeja(nomeja);
         console.log('Get List Pesanan');
-        firestore()
-          .collection('pesanan')
-          .where('meja', '==', nomeja)
-          .where('pemesan', '==', nama)
-          .onSnapshot(onResult, onError);
+        unSubscribe = realtimeGetFire(nama, nomeja);
       }
     };
     // getStorage();
     bootstrapAsync();
     handleMassage();
+    return () => {
+      unSubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const currencyFormat = num => {
@@ -122,14 +322,20 @@ const StatusPesananPage = ({navigation}) => {
       )}
       {list.length !== 0 && (
         <ScrollView vertical>
-          {list.map(item => {
+          {listCatatan.map((item, i) => {
+            let listPesanan = getPesananData(i + 1);
             return (
-              <ItemBelanja
-                key={item.namaPemesan}
-                namaItem={item.namaPesanan}
-                jumlahItem={item.jumlah}
-                hargaItem={item.totalHarga}
-                linkGambar={item.linkGambar}
+              <SectionStatus
+                key={i}
+                listPesanan={listPesanan}
+                catatan={item}
+                status={listStatus[i]}
+                deleteFunction={() => {
+                  deleteBasedOnPesananKe(i);
+                }}
+                updateSampai={() => {
+                  changeSampaiPerPesanan(i);
+                }}
               />
             );
           })}
@@ -149,7 +355,7 @@ const StatusPesananPage = ({navigation}) => {
           </Text>
         </Text>
         <View style={{flexDirection: 'column', alignItems: 'center'}}>
-          {progress === 'Belum Di Proses' && (
+          {/* {progress === 'Belum Di Proses' && (
             <>
               <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
                 Tekan Untuk Batalkan:
@@ -169,8 +375,8 @@ const StatusPesananPage = ({navigation}) => {
                 <Text style={styles.btnText}>Sedang Di Proses</Text>
               </TouchableOpacity>
             </>
-          )}
-          {progress === 'Sedang Di Antar' && (
+          )} */}
+          {progress === 'Sampai' && (
             <>
               <Text style={{color: '#7f8c8d', fontSize: hp('1.3%')}}>
                 Tekan Jika Sudah Sampai Dan Ingin Bayar:
@@ -178,9 +384,9 @@ const StatusPesananPage = ({navigation}) => {
               <TouchableOpacity
                 style={styles.BtnDelivered}
                 onPress={() => {
-                  changeProgress();
+                  changeProgressToBayar();
                 }}>
-                <Text style={styles.btnText}>Diantar</Text>
+                <Text style={styles.btnText}>Sampai Ke Meja</Text>
               </TouchableOpacity>
             </>
           )}
@@ -238,7 +444,7 @@ const styles = StyleSheet.create({
     marginLeft: hp('0.5%'),
   },
   BtnDelivered: {
-    width: wp('19%'),
+    padding: hp('1%'),
     backgroundColor: '#2ecc71',
     borderRadius: hp('4%'),
     height: hp('4.5%'),

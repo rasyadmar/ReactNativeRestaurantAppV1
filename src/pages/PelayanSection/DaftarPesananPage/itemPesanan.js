@@ -59,6 +59,13 @@ const ItemPesanan = ({
             </View>
           </>
         )}
+        {status === 'Sampai' && (
+          <>
+            <View style={styles.BtnStatusGreen}>
+              <Text style={styles.btnText}>{status}</Text>
+            </View>
+          </>
+        )}
         {status === 'Bayar' && (
           <>
             <View style={styles.BtnStatusGreen}>

@@ -8,9 +8,9 @@ import {useEffect, useState} from 'react/cjs/react.development';
 import storage from '@react-native-firebase/storage';
 
 const ItemDetail = ({namaItem, jumlahItem, hargaItem, linkGambar}) => {
-  const [urlGambar, setUrlGambar] = useState('');
+  const [urlGambar, setUrlGambar] = React.useState('');
 
-  useEffect(() => {
+  React.useEffect(() => {
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
       setUrlGambar(url);

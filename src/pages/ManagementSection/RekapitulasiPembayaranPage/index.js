@@ -12,30 +12,51 @@ import firestore from '@react-native-firebase/firestore';
 
 const RekapitulasiPembayaranPage = ({navigation}) => {
   const [bulan, setBulan] = useState([]);
-  const [tahun, setTahun] = useState([]);
-  const [listId, setListId] = useState([]);
+
+  function getUnique(array) {
+    var uniqueArray = [];
+
+    for (let i = 0; i < array.length; i++) {
+      let add = true;
+      if (uniqueArray.length === 0) {
+        uniqueArray.push(array[i]);
+      } else {
+        uniqueArray.map(item => {
+          if (item.bulan === array[i].bulan && item.tahun === array[i].tahun) {
+            add = false;
+            // console.log('ole');
+          }
+        });
+        if (add) {
+          uniqueArray.push(array[i]);
+        }
+      }
+    }
+    return uniqueArray;
+  }
 
   const getFireData = () => {
     let listBulan = [];
-    let listTahun = [];
     let idList = [];
     firestore()
       .collection('DiBayar')
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          listBulan.push(documentSnapshot.data().bulan);
-          listTahun.push(documentSnapshot.data().tahun);
+          listBulan.push({
+            bulan: documentSnapshot.data().bulan,
+            tahun: documentSnapshot.data().tahun,
+          });
           idList.push(documentSnapshot.id);
         });
+        listBulan = getUnique(listBulan);
         setBulan(listBulan);
-        setTahun(listTahun);
-        setListId(idList);
       });
   };
 
   useEffect(() => {
     getFireData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toDetailRekapitulasi = (bulan, tahun) => {
@@ -55,10 +76,12 @@ const RekapitulasiPembayaranPage = ({navigation}) => {
         {bulan.map((item, i) => {
           return (
             <ItemBulanRekapitulasi
-              key={listId[i]}
-              bulan={item}
-              tahun={tahun[i]}
-              toDetailRekapitulasi={() => toDetailRekapitulasi(item, tahun[i])}
+              key={i}
+              bulan={item.bulan}
+              tahun={item.tahun}
+              toDetailRekapitulasi={() =>
+                toDetailRekapitulasi(item.bulan, item.tahun)
+              }
             />
           );
         })}

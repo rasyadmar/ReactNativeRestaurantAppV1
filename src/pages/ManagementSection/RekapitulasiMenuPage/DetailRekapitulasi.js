@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View, Dimensions, Image} from 'react-native';
-import {LineChart} from 'react-native-chart-kit';
+import {LineChart, BarChart} from 'react-native-chart-kit';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   widthPercentageToDP as wp,
@@ -10,16 +10,45 @@ import {useState, useEffect} from 'react/cjs/react.development';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
 import ItemMenuTerjual from './itemMenuTerjual';
+import ItemMenuFav from './itemMenuFav';
 import firestore from '@react-native-firebase/firestore';
 
-const DetailRekapitulasi = ({route}) => {
+const DetailRekapitulasi = ({navigation, route}) => {
   const {bulan, tahun} = route.params;
   const [textbulan, setTextBulan] = useState('');
   const [dataList, setDataList] = useState([]);
-  const [mingguSatu, setMingguSatu] = useState(0);
-  const [mingguDua, setMingguDua] = useState(0);
-  const [mingguTiga, setMingguTiga] = useState(0);
-  const [mingguEmpat, setMingguEmpat] = useState(0);
+  const [listTopRated, setListTopRated] = useState([
+    {
+      namaPesanan: '',
+      jumlah: 0,
+      harga: 0,
+      linkGambar: '',
+    },
+    {
+      namaPesanan: '',
+      jumlah: 0,
+      harga: 0,
+      linkGambar: '',
+    },
+    {
+      namaPesanan: '',
+      jumlah: 0,
+      harga: 0,
+      linkGambar: '',
+    },
+    {
+      namaPesanan: '',
+      jumlah: 0,
+      harga: 0,
+      linkGambar: '',
+    },
+    {
+      namaPesanan: '',
+      jumlah: 0,
+      harga: 0,
+      linkGambar: '',
+    },
+  ]);
 
   const getFireData = () => {
     let listData = [];
@@ -30,17 +59,85 @@ const DetailRekapitulasi = ({route}) => {
       .where('tahun', '==', tahun)
       .get()
       .then(querySnapshot => {
+        console.log('getting data from rekapitulasi menu');
         querySnapshot.forEach(documentSnapshot => {
-          console.log(documentSnapshot);
+          // console.log(documentSnapshot);
           listData.push(documentSnapshot.data());
           // listId.push(documentSnapshot.id);
         });
         sorting(listData);
         // setIdItem(listId);
+        getJumlahAndNamaPesanan(listData);
       });
   };
 
+  const sortByRating = array => {
+    let temp;
+    for (let i = 1; i < array.length; i++) {
+      for (let j = i; j > 0; j--) {
+        if (array[j].jumlah > array[j - 1].jumlah) {
+          temp = array[j];
+          array[j] = array[j - 1];
+          array[j - 1] = temp;
+        }
+      }
+    }
+    if (array.length < 5) {
+      for (let i = array.length; i < 5; i++) {
+        array[i] = {jumlah: 0, namaPesanan: 'Tidak Ada Pesanan'};
+      }
+    }
+    console.log(array);
+    setListTopRated(array);
+  };
+
+  const getJumlahAndNamaPesanan = listIn => {
+    let pesananBaru = [];
+    let add = true;
+    console.log('ole');
+    listIn.map(item => {
+      item.pesanan.map(itemPesanan => {
+        if (pesananBaru.length === 0) {
+          //   console.log('uab');
+          //   console.log(itemPesanan.namaPesanan);
+          pesananBaru.push({
+            namaPesanan: itemPesanan.namaPesanan,
+            jumlah: itemPesanan.jumlah,
+            harga: itemPesanan.totalHarga,
+            linkGambar: itemPesanan.linkGambar,
+          });
+        } else {
+          //   console.log(itemPesanan.namaPesanan);
+          pesananBaru.map((itemIn, i) => {
+            if (itemPesanan.namaPesanan === itemIn.namaPesanan) {
+              console.log('tole');
+              //   console.log(itemPesanan.namaPesanan);
+              add = false;
+              pesananBaru[i].jumlah =
+                pesananBaru[i].jumlah + itemPesanan.jumlah;
+              pesananBaru[i].harga =
+                pesananBaru[i].harga + itemPesanan.totalHarga;
+            } else {
+              add = true;
+            }
+          });
+          if (add) {
+            pesananBaru.push({
+              namaPesanan: itemPesanan.namaPesanan,
+              jumlah: itemPesanan.jumlah,
+              harga: itemPesanan.totalHarga,
+              linkGambar: itemPesanan.linkGambar,
+            });
+          }
+        }
+      });
+    });
+    // console.log(pesananBaru);
+    sortByRating(pesananBaru);
+  };
+
   const sorting = sort => {
+    // console.log(sort);
     let data1 = 0,
       data2 = 0,
       data3 = 0,
@@ -70,10 +167,6 @@ const DetailRekapitulasi = ({route}) => {
       {minggu: 'Minggu 3', totalMenu: data3},
       {minggu: 'Minggu 4', totalMenu: data4},
     ]);
-    setMingguSatu(data1);
-    setMingguDua(data2);
-    setMingguTiga(data3);
-    setMingguEmpat(data4);
   };
   const formatingText = bulanIn => {
     let listBulan = [
@@ -99,12 +192,18 @@ const DetailRekapitulasi = ({route}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = (Dimensions.get('window').width * 96) / 100;
   const data = {
-    labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+    labels: ['(1)', '(2)', '(3)', '(4)', '(5)'],
     datasets: [
       {
-        data: [mingguSatu, mingguDua, mingguTiga, mingguEmpat],
+        data: [
+          listTopRated[0].jumlah,
+          listTopRated[1].jumlah,
+          listTopRated[2].jumlah,
+          listTopRated[3].jumlah,
+          listTopRated[4].jumlah,
+        ],
         color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`, // optional
         strokeWidth: 3, // optional
       },
@@ -112,35 +211,61 @@ const DetailRekapitulasi = ({route}) => {
     legend: [textbulan], // optional
   };
   const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientFromOpacity: 1,
-    backgroundGradientTo: '#fff',
-    backgroundGradientToOpacity: 1,
-    color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`,
+    backgroundGradientFrom: 'orange',
+    backgroundGradientFromOpacity: 0.8,
+    backgroundGradientTo: 'orange',
+    backgroundGradientToOpacity: 0.8,
+    fillShadowGradientOpacity: 0.9,
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     strokeWidth: 3, // optional, default 3
-    barPercentage: 0.5,
+    barPercentage: 1,
     useShadowColorFromDataset: false, // optional
+    propsForVerticalLabels: {width: hp('1%')},
   };
+
+  const moveToRekapPermingguDetail = (bulan, tahun, minggu) => {
+    navigation.navigate('RekapPermingguDetail', {
+      bulan: bulan,
+      tahun: tahun,
+      minggu: minggu,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image style={styles.headerImage} source={header} />
         <Image style={styles.headerlogo} source={logo} />
       </View>
-      <Text style={styles.title}>Grafik Rekapitulasi Menu</Text>
-      <LineChart
+      <Text style={styles.title}>Grafik Menu Favorit</Text>
+      <BarChart
         data={data}
         width={screenWidth}
         height={280}
         chartConfig={chartConfig}
+        style={{margin: hp('1%'), borderRadius: hp('2%')}}
       />
       <ScrollView>
+        <Text style={styles.type}>Pesanan Terlaris</Text>
+        {listTopRated.map((item, i) => {
+          return (
+            <ItemMenuFav
+              key={i}
+              minggu={item.namaPesanan}
+              terjual={item.jumlah}
+            />
+          );
+        })}
+        <Text style={styles.type}>Detail Pesanan Perminggu</Text>
         {dataList.map(item => {
           return (
             <ItemMenuTerjual
               key={item.minggu}
               minggu={item.minggu}
               terjual={item.totalMenu}
+              moveToDetailMinggu={() => {
+                moveToRekapPermingguDetail(bulan, tahun, item.minggu);
+              }}
             />
           );
         })}
@@ -174,5 +299,13 @@ const styles = StyleSheet.create({
     color: '#f39c12',
     fontWeight: 'bold',
     marginVertical: hp('1%'),
+  },
+  type: {
+    margin: hp('1%'),
+    padding: hp('1%'),
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(127, 140, 141,0.1)',
+    fontSize: hp('2.5%'),
+    color: '#7f8c8d',
   },
 });

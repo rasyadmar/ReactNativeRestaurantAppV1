@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View, Dimensions, Image} from 'react-native';
-import {LineChart} from 'react-native-chart-kit';
+import {BarChart} from 'react-native-chart-kit';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   widthPercentageToDP as wp,
@@ -9,10 +9,10 @@ import {
 import {useState, useEffect} from 'react/cjs/react.development';
 import header from '../../../assets/image/headerflip.jpeg';
 import logo from '../../../assets/image/img_logo.jpeg';
-import ItemMenuTerjual from './itemTotalTerjual';
+import ItemTotalTerjual from './itemTotalTerjual';
 import firestore from '@react-native-firebase/firestore';
 
-const DetailRekapitulasi = ({route}) => {
+const DetailRekapitulasi = ({navigation, route}) => {
   const {bulan, tahun} = route.params;
   const [textbulan, setTextBulan] = useState('');
   const [dataList, setDataList] = useState([]);
@@ -30,8 +30,9 @@ const DetailRekapitulasi = ({route}) => {
       .where('tahun', '==', tahun)
       .get()
       .then(querySnapshot => {
+        console.log('getting rekapitulasi bayar data');
         querySnapshot.forEach(documentSnapshot => {
-          console.log(documentSnapshot);
+          // console.log(documentSnapshot);
           listData.push(documentSnapshot.data());
           // listId.push(documentSnapshot.id);
         });
@@ -91,6 +92,18 @@ const DetailRekapitulasi = ({route}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const currencyFormat = num => {
+    return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  };
+
+  const moveToRekapPermingguDetail = (bulan, tahun, minggu) => {
+    navigation.navigate('RekapPermingguDetail', {
+      bulan: bulan,
+      tahun: tahun,
+      minggu: minggu,
+    });
+  };
+
   const screenWidth = Dimensions.get('window').width;
   const data = {
     labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
@@ -108,9 +121,10 @@ const DetailRekapitulasi = ({route}) => {
     backgroundGradientFromOpacity: 1,
     backgroundGradientTo: '#fff',
     backgroundGradientToOpacity: 1,
+    fillShadowGradientOpacity: 0.9,
     color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`,
     strokeWidth: 3, // optional, default 3
-    barPercentage: 0.5,
+    barPercentage: 1,
     useShadowColorFromDataset: false, // optional
   };
   return (
@@ -120,23 +134,42 @@ const DetailRekapitulasi = ({route}) => {
         <Image style={styles.headerlogo} source={logo} />
       </View>
       <Text style={styles.title}>Grafik Rekapitulasi Bayar</Text>
-      <LineChart
+      <BarChart
         data={data}
         width={screenWidth}
         height={280}
+        yAxisLabel="Rp"
         chartConfig={chartConfig}
+        withInnerLines={false}
+        showValuesOnTopOfBars={true}
       />
       <ScrollView>
         {dataList.map(item => {
           return (
-            <ItemMenuTerjual
+            <ItemTotalTerjual
               key={item.minggu}
               minggu={item.minggu}
               totalHarga={item.totalHarga}
+              moveToDetailMinggu={() => {
+                moveToRekapPermingguDetail(bulan, tahun, item.minggu);
+              }}
             />
           );
         })}
       </ScrollView>
+      <View style={styles.footer}>
+        <Text>
+          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>Total: </Text>
+          <Text
+            style={{
+              fontWeight: 'bold',
+              color: '#f39c12',
+              fontSize: hp('2.2%'),
+            }}>
+            {currencyFormat(mingguSatu + mingguDua + mingguTiga + mingguEmpat)}
+          </Text>
+        </Text>
+      </View>
     </View>
   );
 };

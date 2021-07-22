@@ -84,15 +84,15 @@ const RekapPermingguDetail = ({route}) => {
           selectedData.push(item);
         }
       } else if (minggu === 'Minggu 2') {
-        if (item.tanggal <= 14) {
+        if (item.tanggal <= 14 && item.tanggal > 7) {
           selectedData.push(item);
         }
       } else if (minggu === 'Minggu 3') {
-        if (item.tanggal <= 28) {
+        if (item.tanggal <= 28 && item.tanggal > 14) {
           selectedData.push(item);
         }
       } else if (minggu === 'Minggu 4') {
-        if (item.tanggal <= 31) {
+        if (item.tanggal <= 31 && item.tanggal > 28) {
           selectedData.push(item);
         }
       }
@@ -134,19 +134,34 @@ const RekapPermingguDetail = ({route}) => {
         Pemesanan {formatingText(bulan)} {tahun}
       </Text>
       <Text style={styles.title}>{minggu}</Text>
-      <ScrollView>
-        {list.map((item, i) => {
-          return (
-            <ItemPesananMingguan
-              key={i}
-              namaPesanan={item.namaPesanan}
-              jumlah={item.jumlah}
-              totalHarga={item.harga}
-              linkGambar={item.linkGambar}
-            />
-          );
-        })}
-      </ScrollView>
+      {list.length === 0 && (
+        <ScrollView
+          vertical
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>
+            Tidak Ada Pesanan Di Minggu Ini
+          </Text>
+        </ScrollView>
+      )}
+      {list.length !== 0 && (
+        <ScrollView>
+          {list.map((item, i) => {
+            return (
+              <ItemPesananMingguan
+                key={i}
+                namaPesanan={item.namaPesanan}
+                jumlah={item.jumlah}
+                totalHarga={item.harga}
+                linkGambar={item.linkGambar}
+              />
+            );
+          })}
+        </ScrollView>
+      )}
     </View>
   );
 };

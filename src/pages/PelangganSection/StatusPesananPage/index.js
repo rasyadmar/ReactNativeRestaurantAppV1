@@ -233,6 +233,8 @@ const StatusPesananPage = ({navigation}) => {
         countSampai++;
       }
     }
+    console.log(countSampai);
+    console.log(listStatusIN.length);
     if (countSampai === listStatusIN.length) {
       updateProgressFire('Sampai');
       // sedang = false;

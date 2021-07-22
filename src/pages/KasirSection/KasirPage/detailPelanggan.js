@@ -16,10 +16,16 @@ import {
 import {useEffect} from 'react/cjs/react.development';
 import ItemDetail from './itemDetailPesanan';
 import firestore from '@react-native-firebase/firestore';
+import SectionKasir from './SectionKasir';
 
 const DetailPelanggan = ({route, navigation}) => {
-  const {namaPelanggan, nomorMeja, pesanan, totalHarga} = route.params;
-
+  const {namaPelanggan, nomorMeja} = route.params;
+  const [list, setList] = React.useState([]);
+  const [listCatatan, setListCatatan] = React.useState([]);
+  const [listStatus, setListStatus] = React.useState([]);
+  const [totalHarga, setTotalHarga] = React.useState(0);
+  const [progress, setProgress] = React.useState('');
+  const [docName, setDocName] = React.useState('');
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
@@ -56,11 +62,71 @@ const DetailPelanggan = ({route, navigation}) => {
                 console.log('delete pesanan from list pesanan');
               });
           });
+        firestore()
+          .collection('chatlog')
+          .where('meja', '==', noMeja)
+          .where('pemesan', '==', namaPemesan)
+          .get()
+          .then(querySnapshot => {
+            let id2;
+            querySnapshot.forEach(documentSnapshot => {
+              id2 = documentSnapshot.id;
+            });
+            firestore()
+              .collection('chatlog')
+              .doc(id2)
+              .delete()
+              .then(() => {
+                console.log('delete chat from list chat');
+              });
+          });
       });
   };
 
+  function onResult(querySnapshot) {
+    querySnapshot.forEach(documentSnapshot => {
+      // console.log(documentSnapshot);
+      console.log('get Status pesanan data');
+      // console.log(documentSnapshot.data().pesanan);
+      setList(documentSnapshot.data().pesanan);
+      setDocName(documentSnapshot.id);
+      setTotalHarga(documentSnapshot.data().totalHarga);
+      setProgress(documentSnapshot.data().progress);
+      setListCatatan(documentSnapshot.data().catatan);
+      setListStatus(documentSnapshot.data().listStatus);
+    });
+  }
+
+  function onError(error) {
+    console.error(error);
+  }
+
+  const realtimeGetFire = (nama, nomeja) => {
+    const unSubscribe = firestore()
+      .collection('pesanan')
+      .where('meja', '==', nomeja)
+      .where('pemesan', '==', nama)
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
+  };
+
+  const getPesananData = pesananKe => {
+    let pesananIn = [];
+
+    list.map(item => {
+      if (item.pesananKe === pesananKe) {
+        pesananIn.push(item);
+      }
+    });
+    return pesananIn;
+  };
+
   useEffect(() => {
-    console.log(pesanan);
+    let unSubscribe = realtimeGetFire(namaPelanggan, nomorMeja);
+    return () => {
+      unSubscribe();
+    };
+    // console.log(pesanan);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -74,15 +140,10 @@ const DetailPelanggan = ({route, navigation}) => {
       <Text style={styles.itemName}>Nama Pemesan: {namaPelanggan}</Text>
       <Text style={styles.itemName}>Nomor Meja: {nomorMeja}</Text>
       <ScrollView vertical>
-        {pesanan.map(item => {
+        {listCatatan.map((item, i) => {
+          let listPesanan = getPesananData(i + 1);
           return (
-            <ItemDetail
-              key={item.namaPesanan}
-              namaItem={item.namaPesanan}
-              jumlahItem={item.jumlah}
-              hargaItem={item.totalHarga}
-              linkGambar={item.linkGambar}
-            />
+            <SectionKasir key={i} listPesanan={listPesanan} catatan={item} />
           );
         })}
       </ScrollView>
@@ -105,7 +166,7 @@ const DetailPelanggan = ({route, navigation}) => {
           <TouchableOpacity
             style={styles.Btn}
             onPress={() => {
-              bayarFunction(namaPelanggan, nomorMeja, totalHarga, pesanan);
+              bayarFunction(namaPelanggan, nomorMeja, totalHarga, list);
             }}>
             <Text style={styles.btnText}>Bayar</Text>
           </TouchableOpacity>

@@ -104,7 +104,7 @@ const DetailRekapitulasi = ({navigation, route}) => {
     });
   };
 
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = (Dimensions.get('window').width * 96) / 100;
   const data = {
     labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
     datasets: [
@@ -117,12 +117,13 @@ const DetailRekapitulasi = ({navigation, route}) => {
     legend: [textbulan], // optional
   };
   const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientFromOpacity: 1,
-    backgroundGradientTo: '#fff',
-    backgroundGradientToOpacity: 1,
+    backgroundGradientFrom: 'orange',
+    backgroundGradientFromOpacity: 0.8,
+    backgroundGradientTo: 'orange',
+    backgroundGradientToOpacity: 0.8,
     fillShadowGradientOpacity: 0.9,
-    color: (opacity = 1) => `rgba(44, 62, 80, ${opacity})`,
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     strokeWidth: 3, // optional, default 3
     barPercentage: 1,
     useShadowColorFromDataset: false, // optional
@@ -138,10 +139,9 @@ const DetailRekapitulasi = ({navigation, route}) => {
         data={data}
         width={screenWidth}
         height={280}
-        yAxisLabel="Rp"
         chartConfig={chartConfig}
-        withInnerLines={false}
         showValuesOnTopOfBars={true}
+        style={{margin: hp('1%'), borderRadius: hp('1%')}}
       />
       <ScrollView>
         {dataList.map(item => {

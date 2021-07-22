@@ -26,10 +26,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from '../../../../utils/authContext';
 
 const MainPage = ({route, navigation}) => {
-  useEffect(() => {}, []);
+  React.useEffect(() => {}, []);
   const {toPelanggan} = React.useContext(AuthContext);
-  const [atasNama, setAtasNama] = useState('');
-  const [nomorMeja, setNomorMeja] = useState('');
+  const [atasNama, setAtasNama] = React.useState('');
+  const [nomorMeja, setNomorMeja] = React.useState('');
   const run = () => {
     if (atasNama === '' || nomorMeja === '') {
       ToastAndroid.show(

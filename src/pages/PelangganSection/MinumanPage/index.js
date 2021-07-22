@@ -25,20 +25,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
 const MinumanPage = ({navigation}) => {
-  const [list, setList] = useState([]);
-  const [idItem, setIdItem] = useState([]);
-  const [listCoffee, setListCoffee] = useState([]);
-  const [idItemCoffee, setIdItemCoffee] = useState([]);
-  const [listJus, setListJus] = useState([]);
-  const [idItemJus, setIdItemJus] = useState([]);
-  const [listTeh, setListTeh] = useState([]);
-  const [idItemTeh, setIdItemTeh] = useState([]);
-  const [listMilk, setListMilk] = useState([]);
-  const [idItemMilk, setIdItemMilk] = useState([]);
-  const [totalHarga, setTotalHarga] = useState(0);
-  const [statusPesan, setStatusPesan] = useState('');
+  const [list, setList] = React.useState([]);
+  const [idItem, setIdItem] = React.useState([]);
+  const [listCoffee, setListCoffee] = React.useState([]);
+  const [idItemCoffee, setIdItemCoffee] = React.useState([]);
+  const [listJus, setListJus] = React.useState([]);
+  const [idItemJus, setIdItemJus] = React.useState([]);
+  const [listTeh, setListTeh] = React.useState([]);
+  const [idItemTeh, setIdItemTeh] = React.useState([]);
+  const [listMilk, setListMilk] = React.useState([]);
+  const [idItemMilk, setIdItemMilk] = React.useState([]);
+  const [totalHarga, setTotalHarga] = React.useState(0);
+  const [statusPesan, setStatusPesan] = React.useState('');
   const keranjang = useSelector(selectKeranjang);
-  const [once, setOnce] = useState(0);
+  const [once, setOnce] = React.useState(0);
 
   const handleMassage = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -135,7 +135,7 @@ const MinumanPage = ({navigation}) => {
     setIdItemMilk(milk[1]);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (once === 0) {
       const bootstrapAsync = async () => {
         let nama;
@@ -242,22 +242,17 @@ const MinumanPage = ({navigation}) => {
             {currencyFormat(totalHarga)}
           </Text>
         </Text>
-        {statusPesan === 'belum' && (
-          <TouchableOpacity style={styles.Btn}>
-            <Text
-              style={styles.btnText}
-              onPress={() => {
-                navigation.navigate('KeranjangPelanggan');
-              }}>
-              Cek Keranjang
-            </Text>
-          </TouchableOpacity>
-        )}
-        {statusPesan === 'sudah' && (
-          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>
-            Sudah Memesan
+        <TouchableOpacity style={styles.Btn}>
+          <Text
+            style={styles.btnText}
+            onPress={() => {
+              navigation.navigate('KeranjangPelanggan', {
+                statusPesan: statusPesan,
+              });
+            }}>
+            Cek Keranjang
           </Text>
-        )}
+        </TouchableOpacity>
       </View>
     </View>
   );

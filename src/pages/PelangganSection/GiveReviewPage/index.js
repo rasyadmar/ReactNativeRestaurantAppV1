@@ -14,10 +14,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
 const GiveReviewPage = ({navigation}) => {
-  const [rating, setRating] = useState(0);
-  const [komentar, setKomentar] = useState('');
-  const [namaPemesan, setNamaPemesan] = useState('');
-  const [noMeja, setNoMeja] = useState('');
+  const [rating, setRating] = React.useState(0);
+  const [komentar, setKomentar] = React.useState('');
+  const [namaPemesan, setNamaPemesan] = React.useState('');
+  const [noMeja, setNoMeja] = React.useState('');
 
   const handleMassage = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -75,7 +75,7 @@ const GiveReviewPage = ({navigation}) => {
     setRating(rating);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const bootstrapAsync = async () => {
       let nama;
       let nomeja;

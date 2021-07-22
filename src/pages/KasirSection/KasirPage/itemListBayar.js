@@ -74,6 +74,7 @@ const ItemListBayar = ({
       {status === 'Belum Di Proses' && viewItem()}
       {status === 'Sedang Di Proses' && viewItem()}
       {status === 'Sedang Di Antar' && viewItem()}
+      {status === 'Sampai' && viewItem()}
     </View>
   );
 };

@@ -117,18 +117,14 @@ export default function ItemBelanja({
       </View>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
         <View style={{flexDirection: 'row'}}>
-          {statusPes === 'belum' && (
-            <>
-              <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
-                <Text style={styles.btnText}>+</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.BtnPlusMin}
-                onPress={() => substract()}>
-                <Text style={styles.btnText}>-</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
+            <Text style={styles.btnText}>+</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.BtnPlusMin}
+            onPress={() => substract()}>
+            <Text style={styles.btnText}>-</Text>
+          </TouchableOpacity>
         </View>
         <Text style={styles.QtyText}>{qty}</Text>
       </View>

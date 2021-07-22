@@ -25,7 +25,9 @@ import {useEffect, useState} from 'react/cjs/react.development';
 export default function MenuPage({route, navigation}) {
   const dispatch = useDispatch();
   const {toQrScan} = React.useContext(AuthContext);
-  const [notif, setNotif] = useState(0);
+  const [notif, setNotif] = React.useState(0);
+  const [name, setName] = React.useState('');
+  const [noMeja, setNoMeja] = React.useState('');
 
   const handleMassage = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -36,9 +38,15 @@ export default function MenuPage({route, navigation}) {
   };
 
   function onResult(querySnapshot) {
-    if (querySnapshot.fixed) {
+    console.log('ole');
+    if (querySnapshot.length !== 0) {
       querySnapshot.forEach(documentSnapshot => {
         setNotif(
+          documentSnapshot.data().pesan.length -
+            documentSnapshot.data().readPelanggan.length,
+        );
+        console.log('ole');
+        console.log(
           documentSnapshot.data().pesan.length -
             documentSnapshot.data().readPelanggan.length,
         );
@@ -50,7 +58,18 @@ export default function MenuPage({route, navigation}) {
     console.error(error);
   }
 
+  const getChatFire = (nama, nomeja) => {
+    let unSubscribe = firestore()
+      .collection('chatlog')
+      .where('meja', '==', nomeja)
+      .where('pemesan', '==', nama)
+      .onSnapshot(onResult, onError);
+
+    return unSubscribe;
+  };
+
   useEffect(() => {
+    let unSubscribe;
     const bootstrapAsync = async () => {
       let nama;
       let nomeja;
@@ -58,13 +77,16 @@ export default function MenuPage({route, navigation}) {
         nama = await AsyncStorage.getItem('namaPemesan');
         nomeja = await AsyncStorage.getItem('nomorMeja');
       } catch (e) {}
-      firestore()
-        .collection('chatlog')
-        .where('meja', '==', nomeja)
-        .where('pemesan', '==', nama)
-        .onSnapshot(onResult, onError);
+      setNoMeja(nomeja);
+      setName(nama);
+      unSubscribe = getChatFire(nama, nomeja);
     };
-    handleMassage();
+    // handleMassage();
+    bootstrapAsync();
+    return () => {
+      unSubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const logOut = () => {
@@ -73,6 +95,70 @@ export default function MenuPage({route, navigation}) {
       .then(() => {
         console.log('log Out');
       });
+  };
+
+  const deletePesananAndChat = (namaPemesan, noMeja) => {
+    firestore()
+      .collection('pesanan')
+      .where('meja', '==', noMeja)
+      .where('pemesan', '==', namaPemesan)
+      .get()
+      .then(querySnapshot => {
+        let id;
+        querySnapshot.forEach(documentSnapshot => {
+          id = documentSnapshot.id;
+        });
+        firestore()
+          .collection('pesanan')
+          .doc(id)
+          .delete()
+          .then(() => {
+            console.log('delete pesanan from list pesanan');
+          });
+      });
+    firestore()
+      .collection('chatlog')
+      .where('meja', '==', noMeja)
+      .where('pemesan', '==', namaPemesan)
+      .get()
+      .then(querySnapshot => {
+        let id2;
+        querySnapshot.forEach(documentSnapshot => {
+          id2 = documentSnapshot.id;
+        });
+        firestore()
+          .collection('chatlog')
+          .doc(id2)
+          .delete()
+          .then(() => {
+            console.log('delete chat from list chat');
+          });
+      });
+  };
+
+  const pressLogout = (nameIn, noMejaIn) => {
+    Alert.alert(
+      'Peringatan',
+      // 'Saat Logout Data Pesanan Anda dan Chat Anda Akan Di Hapus. Sudah Membayar Pesanan Anda',
+      'Yakin Ingin LogOut?',
+      [
+        {text: 'Tidak', onPress: () => {}},
+        {
+          text: 'Ya',
+          onPress: () => {
+            AsyncStorage.setItem('sekarang', 'belumregis');
+            AsyncStorage.setItem('namaPemesan', '');
+            AsyncStorage.setItem('nomorMeja', '');
+            toQrScan();
+            dispatch(deleteAll());
+            // deletePesananAndChat(nameIn, noMejaIn);
+            try {
+              logOut();
+            } catch (e) {}
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -112,14 +198,7 @@ export default function MenuPage({route, navigation}) {
         <TouchableOpacity
           style={styles.BtnFooter}
           onPress={() => {
-            AsyncStorage.setItem('sekarang', 'belumregis');
-            AsyncStorage.setItem('namaPemesan', '');
-            AsyncStorage.setItem('nomorMeja', '');
-            toQrScan();
-            dispatch(deleteAll());
-            try {
-              logOut();
-            } catch (e) {}
+            pressLogout(name, noMeja);
           }}>
           <Text style={styles.btnTextFooter}>Log Out</Text>
         </TouchableOpacity>
@@ -129,7 +208,7 @@ export default function MenuPage({route, navigation}) {
             onPress={() => {
               navigation.navigate('NotificationPage');
             }}>
-            <Text style={styles.btnTextNotif}>Chat Pelayan</Text>
+            <Text style={styles.btnTextNotif}>Chat Dapur</Text>
             <Text style={styles.notif}>{notif}</Text>
           </TouchableOpacity>
         )}
@@ -139,7 +218,7 @@ export default function MenuPage({route, navigation}) {
             onPress={() => {
               navigation.navigate('NotificationPage');
             }}>
-            <Text style={styles.btnTextNotif}>Chat Pelayan</Text>
+            <Text style={styles.btnTextNotif}>Chat Dapur</Text>
           </TouchableOpacity>
         )}
       </View>

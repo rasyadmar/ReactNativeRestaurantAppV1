@@ -29,7 +29,7 @@ export default function QRScanPage({navigation}) {
   } = React.useContext(AuthContext);
   // const {management} = React.useContext(AuthContext);
 
-  useEffect(() => {
+  React.useEffect(() => {
     AsyncStorage.setItem('statusPesan', 'belum');
   }, []);
 

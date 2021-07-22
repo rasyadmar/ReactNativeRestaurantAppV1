@@ -31,18 +31,22 @@ const KasirPage = ({navigation}) => {
 
   const getListBayar = () => {
     console.log('Get List Kasir');
-    firestore().collection('pesanan').onSnapshot(onResult, onError);
+    let unSubscribe = firestore()
+      .collection('pesanan')
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
   };
   useEffect(() => {
-    getListBayar();
+    let unSubscribe = getListBayar();
+    return () => {
+      unSubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const DetailFunction = (namaPelanggan, nomorMeja, pesanan, totalHarga) => {
+  const DetailFunction = (namaPelanggan, nomorMeja) => {
     navigation.navigate('DetailPelangganKasir', {
       namaPelanggan: namaPelanggan,
       nomorMeja: nomorMeja,
-      pesanan: pesanan,
-      totalHarga: totalHarga,
     });
   };
   return (
@@ -75,14 +79,7 @@ const KasirPage = ({navigation}) => {
                 nomorMeja={item.meja}
                 status={item.progress}
                 id={listId[i]}
-                detailFunction={() =>
-                  DetailFunction(
-                    item.pemesan,
-                    item.meja,
-                    item.pesanan,
-                    item.totalHarga,
-                  )
-                }
+                detailFunction={() => DetailFunction(item.pemesan, item.meja)}
               />
             );
           })}

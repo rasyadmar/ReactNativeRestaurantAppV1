@@ -20,10 +20,10 @@ import {TextInput} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
 const UpdatestokPage = () => {
-  const [list, setList] = useState([]);
-  const [id, setId] = useState([]);
-  const [displayedList, setDisplayedList] = useState([]);
-  const [displayedId, setDisplayedId] = useState([]);
+  const [list, setList] = React.useState([]);
+  const [id, setId] = React.useState([]);
+  const [displayedList, setDisplayedList] = React.useState([]);
+  const [displayedId, setDisplayedId] = React.useState([]);
 
   function onResult(querySnapshot) {
     let listIn = [];
@@ -46,7 +46,7 @@ const UpdatestokPage = () => {
   const getFireData = () => {
     firestore().collection('menu').onSnapshot(onResult, onError);
   };
-  useEffect(() => {
+  React.useEffect(() => {
     getFireData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,7 +83,7 @@ const UpdatestokPage = () => {
       <View style={styles.inputView}>
         <TextInput
           style={styles.inputText}
-          placeholder="Cari Menu..."
+          placeholder="Cari Menu (Tulis Lengkap Menu)..."
           placeholderTextColor="#7f8c8d"
           onChangeText={text => {
             filteringList(text);

@@ -16,7 +16,6 @@ const ItemDetail = ({namaItem, jumlahItem, hargaItem, linkGambar}) => {
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
       // console.log(linkGambar);
-      console.log('ini', url);
       setUrlGambar(url);
     };
     bootstrapAsync();

@@ -14,10 +14,10 @@ import ItemChatInside from './itemChatInside';
 
 const ChatPage = ({route}) => {
   const {namaPelanggan, nomorMeja} = route.params;
-  const [chatList, setChatList] = useState([]);
-  const scrollViewRef = useRef();
-  const [itemId, setItemId] = useState('');
-  const [inputText, setInputText] = useState('');
+  const [chatList, setChatList] = React.useState([]);
+  const scrollViewRef = React.useRef();
+  const [itemId, setItemId] = React.useState('');
+  const [inputText, setInputText] = React.useState('');
 
   function onResult(querySnapshot) {
     let id;
@@ -43,11 +43,12 @@ const ChatPage = ({route}) => {
   }
 
   const getFireChat = () => {
-    firestore()
+    let unSubscribe = firestore()
       .collection('chatlog')
       .where('meja', '==', nomorMeja)
       .where('pemesan', '==', namaPelanggan)
       .onSnapshot(onResult, onError);
+    return unSubscribe;
   };
 
   const getTodayTimeDate = () => {
@@ -82,7 +83,10 @@ const ChatPage = ({route}) => {
   };
 
   useEffect(() => {
-    getFireChat();
+    let unSubscribe = getFireChat();
+    return () => {
+      unSubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

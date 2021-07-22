@@ -216,11 +216,11 @@ const DetailRekapitulasi = ({navigation, route}) => {
     backgroundGradientTo: 'orange',
     backgroundGradientToOpacity: 0.8,
     fillShadowGradientOpacity: 0.9,
+    decimalPlaces: 1,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     strokeWidth: 3, // optional, default 3
     barPercentage: 1,
     useShadowColorFromDataset: false, // optional
-    propsForVerticalLabels: {width: hp('1%')},
   };
 
   const moveToRekapPermingguDetail = (bulan, tahun, minggu) => {
@@ -243,6 +243,7 @@ const DetailRekapitulasi = ({navigation, route}) => {
         width={screenWidth}
         height={280}
         chartConfig={chartConfig}
+        showValuesOnTopOfBars={true}
         style={{margin: hp('1%'), borderRadius: hp('2%')}}
       />
       <ScrollView>

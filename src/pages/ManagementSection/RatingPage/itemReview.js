@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     marginVertical: hp('1%'),
     marginHorizontal: hp('3%'),
     padding: hp('3%'),
-    backgroundColor: '#34495e',
+    backgroundColor: '#e67e22',
     borderRadius: hp('1%'),
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -18,8 +18,8 @@ import firestore from '@react-native-firebase/firestore';
 import ItemChat from './itemChat.js';
 
 const ChatPelangganPage = ({navigation}) => {
-  const [listChat, setListChat] = useState([]);
-  const [listId, setlistId] = useState([]);
+  const [listChat, setListChat] = React.useState([]);
+  const [listId, setlistId] = React.useState([]);
 
   function onResult(querySnapshot) {
     let listChatIn = [];
@@ -37,7 +37,10 @@ const ChatPelangganPage = ({navigation}) => {
   }
 
   const getChat = () => {
-    firestore().collection('chatlog').onSnapshot(onResult, onError);
+    let unSubscribe = firestore()
+      .collection('chatlog')
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
   };
 
   const DetailFunction = (namaPelanggan, nomorMeja) => {
@@ -49,8 +52,12 @@ const ChatPelangganPage = ({navigation}) => {
   };
 
   useEffect(() => {
-    getChat();
+    let unSubscribe = getChat();
     console.log('Using Use Effect');
+    return () => {
+      unSubscribe();
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

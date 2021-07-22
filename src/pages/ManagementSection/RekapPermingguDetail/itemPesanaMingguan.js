@@ -31,7 +31,9 @@ const ItemPesanaMingguan = ({namaPesanan, jumlah, totalHarga, linkGambar}) => {
       <View style={styles.itemData}>
         <Text style={styles.itemName}>{namaPesanan}</Text>
         <Text style={styles.itemJumlah}>Jumlah: {jumlah}</Text>
-        <Text style={styles.itemJumlah}>Harga: {totalHarga}</Text>
+        <Text style={styles.itemJumlah}>
+          Harga: {currencyFormat(totalHarga)}
+        </Text>
       </View>
     </View>
   );

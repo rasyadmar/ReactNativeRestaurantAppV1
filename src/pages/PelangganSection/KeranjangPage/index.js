@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ToastAndroid,
+  TextInput,
 } from 'react-native';
 import {useEffect, useState} from 'react/cjs/react.development';
 import {
@@ -24,15 +25,20 @@ import {selectPesanStatus} from '../../../features/statusPesanSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
+import {useDispatch} from 'react-redux';
+import {deleteAll} from '../../../features/keranjangSlice';
 
 const KERANJANG = 'List Keranjang Presistence';
 
-const KeranjangPage = ({navigation}) => {
-  const [list, setList] = useState([]);
-  const [totalHarga, setTotalHarga] = useState(0);
-  const [namaPemesa, setNamaPemesan] = useState('');
-  const [noMeja, setNoMeja] = useState('');
-  const [token, setToken] = useState('');
+const KeranjangPage = ({navigation, route}) => {
+  const {statusPesan} = route.params;
+  const dispatch = useDispatch();
+  const [list, setList] = React.useState([]);
+  const [totalHarga, setTotalHarga] = React.useState(0);
+  const [namaPemesa, setNamaPemesan] = React.useState('');
+  const [noMeja, setNoMeja] = React.useState('');
+  const [token, setToken] = React.useState('');
+  const [catatIn, setCatatIn] = React.useState('');
   let keranjang = useSelector(selectKeranjang);
 
   const handleMassage = () => {
@@ -53,7 +59,11 @@ const KeranjangPage = ({navigation}) => {
     setTotalHarga(harga);
   };
 
-  useEffect(() => {
+  const deleteAllKeranjang = () => {
+    dispatch(deleteAll());
+  };
+
+  React.useEffect(() => {
     const bootstrapAsync = async () => {
       let nama;
       let nomeja;
@@ -79,6 +89,114 @@ const KeranjangPage = ({navigation}) => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
 
+  const submitPressed = () => {
+    Alert.alert(
+      'Peringatan',
+      'Saat Pesanan Sudah Diproses, Pesanan Tidak Bisa di Batalkan.\nYakin Ingin Melanjutkan?',
+      [
+        {text: 'Tidak', onPress: () => {}},
+        {
+          text: 'Ya',
+          onPress: () => {
+            let pesanan = [];
+            let catatan = [];
+            let pesananUpdate = [];
+            let statusTiapPesanan = [];
+            let id;
+            let pesananKeIn;
+            let hargaDulu;
+            let hargaSekarang;
+            list.map(item => {
+              pesanan.push({
+                jumlah: item.qty,
+                linkGambar: item.linkGambar,
+                namaPesanan: item.nama,
+                totalHarga: item.harga * item.qty,
+                pesananKe: 1,
+              });
+              firestore()
+                .collection('menu')
+                .doc(item.id)
+                .get()
+                .then(documentSnapshot => {
+                  if (documentSnapshot.exists) {
+                    firestore()
+                      .collection('menu')
+                      .doc(item.id)
+                      .update({
+                        stok: documentSnapshot.data().stok - item.qty,
+                      })
+                      .then(() => {
+                        console.log('stok is updated!');
+                      });
+                  }
+                });
+            });
+            firestore()
+              .collection('pesanan')
+              .where('pemesan', '==', namaPemesa)
+              .where('meja', '==', noMeja)
+              .get()
+              .then(querySnapshot => {
+                if (querySnapshot.size !== 0) {
+                  querySnapshot.forEach(documentSnapshot => {
+                    catatan = documentSnapshot.data().catatan;
+                    id = documentSnapshot.id;
+                    pesananKeIn = documentSnapshot.data().pesananKe;
+                    pesananUpdate = documentSnapshot.data().pesanan;
+                    statusTiapPesanan = documentSnapshot.data().listStatus;
+                    hargaDulu = documentSnapshot.data().totalHarga;
+                  });
+                  catatan.push(catatIn);
+                  pesanan.map(item => {
+                    item.pesananKe = pesananKeIn + 1;
+                    pesananUpdate.push(item);
+                  });
+                  hargaSekarang = totalHarga + hargaDulu;
+                  statusTiapPesanan.push('Belum Di Proses');
+                  console.log(pesananUpdate);
+                  firestore()
+                    .collection('pesanan')
+                    .doc(id)
+                    .update({
+                      catatan: catatan,
+                      pesanan: pesananUpdate,
+                      pesananKe: pesananKeIn + 1,
+                      listStatus: statusTiapPesanan,
+                      totalHarga: hargaSekarang,
+                      progress: 'Belum Di Proses',
+                    })
+                    .then(() => {
+                      deleteAllKeranjang();
+                      navigation.navigate('MenuPelanggan');
+                    });
+                } else {
+                  catatan.push(catatIn);
+                  firestore()
+                    .collection('pesanan')
+                    .add({
+                      pemesan: namaPemesa,
+                      meja: noMeja,
+                      pesanan: pesanan,
+                      catatan: catatan,
+                      progress: 'Belum Di Proses',
+                      totalHarga: totalHarga,
+                      token: token,
+                      pesananKe: 1,
+                      listStatus: ['Belum Di Proses'],
+                    })
+                    .then(() => {
+                      deleteAllKeranjang();
+                      navigation.navigate('MenuPelanggan');
+                    });
+                }
+              });
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={{backgroundColor: '#fff', flex: 1}}>
       <View style={styles.header}>
@@ -86,19 +204,46 @@ const KeranjangPage = ({navigation}) => {
         <Image style={styles.headerlogo} source={logo} />
       </View>
       <Text style={styles.title}>Keranjang</Text>
-      <ScrollView vertical>
-        {list.map(item => {
-          return (
-            <ItemBelanja
-              key={item.nama}
-              namaItem={item.nama}
-              jumlahItem={item.stok}
-              hargaItem={item.harga}
-              linkGambar={item.linkGambar}
-            />
-          );
-        })}
-      </ScrollView>
+
+      {list.length === 0 && (
+        <ScrollView
+          vertical
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>
+            Tidak Ada Pesanan Yang Terkonfirmasi Dari Keranjang
+          </Text>
+        </ScrollView>
+      )}
+
+      {list.length !== 0 && (
+        <ScrollView vertical>
+          {list.map(item => {
+            return (
+              <ItemBelanja
+                key={item.nama}
+                namaItem={item.nama}
+                jumlahItem={item.stok}
+                hargaItem={item.harga}
+                linkGambar={item.linkGambar}
+              />
+            );
+          })}
+          <TextInput
+            style={styles.inputText}
+            placeholder="Beri Catatan Pesanan..."
+            placeholderTextColor="#7f8c8d"
+            multiline={true}
+            value={catatIn}
+            onChangeText={text => {
+              setCatatIn(text);
+            }}></TextInput>
+        </ScrollView>
+      )}
+
       <View style={styles.footer}>
         <Text>
           <Text style={{color: '#7f8c8d', fontSize: hp('1.5%')}}>Total: </Text>
@@ -112,66 +257,25 @@ const KeranjangPage = ({navigation}) => {
           </Text>
         </Text>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.Btn}>
-            <Text
-              style={styles.btnText}
+          {list.length !== 0 && (
+            <TouchableOpacity
+              style={styles.Btn}
               onPress={() => {
-                Alert.alert(
-                  'Peringatan',
-                  'Saat Pesanan Sudah Diproses, Pesanan Tidak Bisa di Batalkan.\nYakin Ingin Melanjutkan?',
-                  [
-                    {text: 'Tidak', onPress: () => {}},
-                    {
-                      text: 'Ya',
-                      onPress: () => {
-                        let pesanan = [];
-                        list.map(item => {
-                          pesanan.push({
-                            jumlah: item.qty,
-                            linkGambar: item.linkGambar,
-                            namaPesanan: item.nama,
-                            totalHarga: item.harga * item.qty,
-                          });
-                          firestore()
-                            .collection('menu')
-                            .doc(item.id)
-                            .get()
-                            .then(documentSnapshot => {
-                              if (documentSnapshot.exists) {
-                                firestore()
-                                  .collection('menu')
-                                  .doc(item.id)
-                                  .update({
-                                    stok:
-                                      documentSnapshot.data().stok - item.qty,
-                                  })
-                                  .then(() => {
-                                    console.log('stok is updated!');
-                                  });
-                              }
-                            });
-                        });
-                        firestore()
-                          .collection('pesanan')
-                          .add({
-                            pemesan: namaPemesa,
-                            meja: noMeja,
-                            pesanan: pesanan,
-                            progress: 'Belum Di Proses',
-                            totalHarga: totalHarga,
-                            token: token,
-                          })
-                          .then(() => {
-                            navigation.navigate('MenuPelanggan');
-                          });
-                      },
-                    },
-                  ],
-                );
+                submitPressed();
               }}>
-              Pesan
-            </Text>
-          </TouchableOpacity>
+              {statusPesan === 'sudah' && (
+                <Text style={styles.btnText}>Pesan Lagi</Text>
+              )}
+              {statusPesan === 'belum' && (
+                <Text style={styles.btnText}>Pesan</Text>
+              )}
+            </TouchableOpacity>
+          )}
+          {list.length === 0 && (
+            <View style={styles.Btn}>
+              <Text style={styles.btnText}>Tidak Ada Pesanan</Text>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -222,7 +326,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   Btn: {
-    width: wp('19%'),
+    padding: hp('1%'),
     backgroundColor: '#f39c12',
     borderRadius: hp('4%'),
     height: hp('4.5%'),
@@ -234,5 +338,14 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: hp('1.8%'),
+  },
+  inputText: {
+    width: wp('80%'),
+    backgroundColor: '#ecf0f1',
+    alignSelf: 'center',
+    borderRadius: hp('4%'),
+    padding: 15,
+    fontSize: hp('1.7%'),
+    color: '#7f8c8d',
   },
 });

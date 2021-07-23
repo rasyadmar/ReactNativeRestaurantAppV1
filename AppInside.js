@@ -17,6 +17,7 @@ import MainPagePelayan from './src/pages/PelayanSection/MainPage';
 import DaftarPesananPelayan from './src/pages/PelayanSection/DaftarPesananPage';
 import UpdateStokPelayan from './src/pages/PelayanSection/UpdateStokPage';
 import ChatPelangganPelayan from './src/pages/PelayanSection/ChatPelangganPage';
+import HalamanChatPelayan from './src/pages/PelayanSection/ChatPelangganPage/chatPage';
 import DetailPelanggan from './src/pages/PelayanSection/DaftarPesananPage/detailPelanggan';
 import RatingPage from './src/pages/ManagementSection/RatingPage';
 import RekapitulasiMenuPage from './src/pages/ManagementSection/RekapitulasiMenuPage';
@@ -25,6 +26,7 @@ import MainPageManagement from './src/pages/ManagementSection/MainPage';
 import DetailRekapitulasiMenu from './src/pages/ManagementSection/RekapitulasiMenuPage/DetailRekapitulasi';
 import DetailRekapitulasiBayar from './src/pages/ManagementSection/RekapitulasiPembayaranPage/DetailRekapitulasi';
 import LoginManagement from './src/pages/ManagementSection/LoginPage';
+import RekapPermingguDetail from './src/pages/ManagementSection/RekapPermingguDetail';
 import {AuthContext} from './utils/authContext';
 import {reducer, initialState} from './reducer';
 
@@ -169,6 +171,10 @@ const AppInside = ({navigation}) => {
               component={ChatPelangganPelayan}
             />
             <Stack.Screen
+              name="HalamanChatPelayan"
+              component={HalamanChatPelayan}
+            />
+            <Stack.Screen
               name="DetailPelanggan"
               component={DetailPelanggan}
               initialParams={{
@@ -209,9 +215,11 @@ const AppInside = ({navigation}) => {
             <Stack.Screen
               name="DetailRekapitulasiBayar"
               component={DetailRekapitulasiBayar}
-              initialParams={{
-                bulan: 'none',
-              }}
+            />
+
+            <Stack.Screen
+              name="RekapPermingguDetail"
+              component={RekapPermingguDetail}
             />
           </>,
         );

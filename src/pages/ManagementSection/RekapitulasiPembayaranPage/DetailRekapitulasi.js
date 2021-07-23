@@ -14,12 +14,12 @@ import firestore from '@react-native-firebase/firestore';
 
 const DetailRekapitulasi = ({navigation, route}) => {
   const {bulan, tahun} = route.params;
-  const [textbulan, setTextBulan] = useState('');
-  const [dataList, setDataList] = useState([]);
-  const [mingguSatu, setMingguSatu] = useState(0);
-  const [mingguDua, setMingguDua] = useState(0);
-  const [mingguTiga, setMingguTiga] = useState(0);
-  const [mingguEmpat, setMingguEmpat] = useState(0);
+  const [textbulan, setTextBulan] = React.useState('');
+  const [dataList, setDataList] = React.useState([]);
+  const [mingguSatu, setMingguSatu] = React.useState(0);
+  const [mingguDua, setMingguDua] = React.useState(0);
+  const [mingguTiga, setMingguTiga] = React.useState(0);
+  const [mingguEmpat, setMingguEmpat] = React.useState(0);
 
   const getFireData = () => {
     let listData = [];
@@ -86,7 +86,7 @@ const DetailRekapitulasi = ({navigation, route}) => {
     setTextBulan(listBulan[bulanIn]);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     getFireData();
     formatingText(bulan);
     // eslint-disable-next-line react-hooks/exhaustive-deps

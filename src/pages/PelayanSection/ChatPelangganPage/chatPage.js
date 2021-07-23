@@ -82,7 +82,7 @@ const ChatPage = ({route}) => {
     setInputText('');
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     let unSubscribe = getFireChat();
     return () => {
       unSubscribe();

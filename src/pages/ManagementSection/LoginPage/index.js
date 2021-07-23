@@ -27,10 +27,10 @@ import {AuthContext} from '../../../../utils/authContext';
 import auth from '@react-native-firebase/auth';
 
 const MainPage = ({route, navigation}) => {
-  useEffect(() => {}, []);
+  React.useEffect(() => {}, []);
   const {toManagement} = React.useContext(AuthContext);
-  const [emailManager, setEmailManager] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailManager, setEmailManager] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const loginFireBase = () => {
     auth()

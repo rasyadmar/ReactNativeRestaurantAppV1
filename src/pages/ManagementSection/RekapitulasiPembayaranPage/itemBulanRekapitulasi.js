@@ -8,7 +8,7 @@ import {
 import {useEffect, useState} from 'react/cjs/react.development';
 
 const ItemBulanRekapitulasi = ({bulan, tahun, toDetailRekapitulasi}) => {
-  const [text, setText] = useState('');
+  const [text, setText] = React.useState('');
   const formatingText = (bulanIn, tahunIn) => {
     let listBulan = [
       'Januari',
@@ -26,7 +26,7 @@ const ItemBulanRekapitulasi = ({bulan, tahun, toDetailRekapitulasi}) => {
     ];
     setText(listBulan[bulanIn] + ' ' + tahunIn);
   };
-  useEffect(() => {
+  React.useEffect(() => {
     formatingText(bulan, tahun);
   });
   return (

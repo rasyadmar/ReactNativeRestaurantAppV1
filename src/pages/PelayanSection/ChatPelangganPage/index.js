@@ -51,7 +51,7 @@ const ChatPelangganPage = ({navigation}) => {
     });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     let unSubscribe = getChat();
     console.log('Using Use Effect');
     return () => {

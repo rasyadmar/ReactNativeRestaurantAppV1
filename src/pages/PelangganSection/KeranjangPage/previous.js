@@ -47,7 +47,7 @@ const Item = ({pesanan, jumlah}) => {
 const KeranjangPage = () => {
   const [keranjangBelanja, setkeranjang] = useState([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     console.log(setkeranjang(Keranjang));
   }, []);
 

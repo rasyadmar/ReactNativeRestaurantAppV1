@@ -68,7 +68,7 @@ export default function MenuPage({route, navigation}) {
     return unSubscribe;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     let unSubscribe;
     const bootstrapAsync = async () => {
       let nama;

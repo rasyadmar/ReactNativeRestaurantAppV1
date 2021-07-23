@@ -15,9 +15,9 @@ import firestore from '@react-native-firebase/firestore';
 
 const DetailRekapitulasi = ({navigation, route}) => {
   const {bulan, tahun} = route.params;
-  const [textbulan, setTextBulan] = useState('');
-  const [dataList, setDataList] = useState([]);
-  const [listTopRated, setListTopRated] = useState([
+  const [textbulan, setTextBulan] = React.useState('');
+  const [dataList, setDataList] = React.useState([]);
+  const [listTopRated, setListTopRated] = React.useState([
     {
       namaPesanan: '',
       jumlah: 0,
@@ -186,7 +186,7 @@ const DetailRekapitulasi = ({navigation, route}) => {
     setTextBulan(listBulan[bulanIn]);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     getFireData();
     formatingText(bulan);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -249,13 +249,15 @@ const DetailRekapitulasi = ({navigation, route}) => {
       <ScrollView>
         <Text style={styles.type}>Pesanan Terlaris</Text>
         {listTopRated.map((item, i) => {
-          return (
-            <ItemMenuFav
-              key={i}
-              minggu={item.namaPesanan}
-              terjual={item.jumlah}
-            />
-          );
+          if (i < 5) {
+            return (
+              <ItemMenuFav
+                key={i}
+                minggu={item.namaPesanan}
+                terjual={item.jumlah}
+              />
+            );
+          }
         })}
         <Text style={styles.type}>Detail Pesanan Perminggu</Text>
         {dataList.map(item => {

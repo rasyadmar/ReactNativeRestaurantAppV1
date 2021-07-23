@@ -203,22 +203,22 @@ const StatusPesananPage = ({navigation}) => {
     return pesananIn;
   };
 
-  const updateProgressFire = progress => {
+  const updateProgressFire = (progressIn, docNameIn) => {
     firestore()
       .collection('pesanan')
-      .doc(docName)
+      .doc(docNameIn)
       .update({
-        progress: progress,
+        progress: progressIn,
       })
       .then(() => {
-        console.log('by pelanggan progress is updated to ' + progress);
+        console.log('by pelanggan progress is updated to ' + progressIn);
       });
   };
-  const cekStatusPesanan = listStatusIN => {
+  const cekStatusPesanan = (listStatusIN, docNameIn) => {
     let countSampai = 0;
     // let sedang = false;
     // let diantar = false;
-    for (let i = 0; i < listStatusIN.length; i++) {
+    listStatusIN.map(item => {
       // if (listStatusIN[i] === 'Belum Di Proses') {
       //   sedang = false;
       //   diantar = false;
@@ -229,14 +229,15 @@ const StatusPesananPage = ({navigation}) => {
       //   sedang = true;
       // } else if (listStatusIN[i] === 'Sedang Di Antar') {
       //   diantar = true;
-      if (listStatusIN[i] === 'Sampai') {
+      if (item === 'Sampai') {
         countSampai++;
       }
-    }
+    });
     console.log(countSampai);
     console.log(listStatusIN.length);
     if (countSampai === listStatusIN.length) {
-      updateProgressFire('Sampai');
+      console.log('kondisi update sampai terpenuhi');
+      updateProgressFire('Sampai', docNameIn);
       // sedang = false;
       // diantar = false;
     }
@@ -258,7 +259,7 @@ const StatusPesananPage = ({navigation}) => {
       setProgress(documentSnapshot.data().progress);
       setListCatatan(documentSnapshot.data().catatan);
       setListStatus(documentSnapshot.data().listStatus);
-      cekStatusPesanan(documentSnapshot.data().listStatus);
+      cekStatusPesanan(documentSnapshot.data().listStatus, documentSnapshot.id);
     });
   }
 

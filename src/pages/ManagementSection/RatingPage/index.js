@@ -11,9 +11,9 @@ import ItemReview from './itemReview';
 import firestore from '@react-native-firebase/firestore';
 
 const RatingPage = () => {
-  const [rating, setRating] = useState(1);
-  const [reviewId, setReviewId] = useState([]);
-  const [reviewList, setReviewList] = useState([]);
+  const [rating, setRating] = React.useState(1);
+  const [reviewId, setReviewId] = React.useState([]);
+  const [reviewList, setReviewList] = React.useState([]);
 
   const getDataFromFire = () => {
     let listGet = [];
@@ -39,7 +39,7 @@ const RatingPage = () => {
     });
     setRating((rating / listGet.length).toFixed(1));
   };
-  useEffect(() => {
+  React.useEffect(() => {
     getDataFromFire();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

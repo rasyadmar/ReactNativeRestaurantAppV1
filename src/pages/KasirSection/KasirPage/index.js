@@ -11,8 +11,8 @@ import {useState, useEffect} from 'react/cjs/react.development';
 import firestore from '@react-native-firebase/firestore';
 
 const KasirPage = ({navigation}) => {
-  const [list, setList] = useState([]);
-  const [listId, setListId] = useState([]);
+  const [list, setList] = React.useState([]);
+  const [listId, setListId] = React.useState([]);
 
   function onResult(querySnapshot) {
     let listGet = [];
@@ -36,7 +36,7 @@ const KasirPage = ({navigation}) => {
       .onSnapshot(onResult, onError);
     return unSubscribe;
   };
-  useEffect(() => {
+  React.useEffect(() => {
     let unSubscribe = getListBayar();
     return () => {
       unSubscribe();

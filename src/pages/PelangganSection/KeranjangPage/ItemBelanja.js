@@ -24,8 +24,8 @@ export default function ItemBelanja({
 }) {
   const dispatch = useDispatch();
   const keranjang = useSelector(selectKeranjang);
-  const [qty, setQty] = useState(0);
-  const [urlGambar, setUrlGambar] = useState('');
+  const [qty, setQty] = React.useState(0);
+  const [urlGambar, setUrlGambar] = React.useState('');
 
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -40,7 +40,7 @@ export default function ItemBelanja({
       });
     }
   };
-  useEffect(() => {
+  React.useEffect(() => {
     checkKeranjang();
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
@@ -101,13 +101,13 @@ export default function ItemBelanja({
       </View>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
-            <Text style={styles.btnText}>+</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={styles.BtnPlusMin}
             onPress={() => substract()}>
             <Text style={styles.btnText}>-</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
+            <Text style={styles.btnText}>+</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.QtyText}>{qty}</Text>

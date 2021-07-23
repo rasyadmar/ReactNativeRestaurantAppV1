@@ -8,11 +8,11 @@ import {useEffect, useState} from 'react/cjs/react.development';
 import storage from '@react-native-firebase/storage';
 
 const ItemDetail = ({namaItem, jumlahItem, hargaItem, linkGambar}) => {
-  const [urlGambar, setUrlGambar] = useState('');
+  const [urlGambar, setUrlGambar] = React.useState('');
   const currencyFormat = num => {
     return 'Rp' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
-  useEffect(() => {
+  React.useEffect(() => {
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
       // console.log(linkGambar);

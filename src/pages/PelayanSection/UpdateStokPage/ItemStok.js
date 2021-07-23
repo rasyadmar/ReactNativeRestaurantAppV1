@@ -28,10 +28,10 @@ export default function ItemBelanja({
   jumlahItem,
   linkGambar,
 }) {
-  const [qty, setQty] = useState(0);
-  const [urlGambar, setUrlGambar] = useState(0);
+  const [qty, setQty] = React.useState(0);
+  const [urlGambar, setUrlGambar] = React.useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
       setUrlGambar(url);

@@ -28,9 +28,9 @@ export default function ItemBelanja({
 }) {
   const dispatch = useDispatch();
   const keranjang = useSelector(selectKeranjang);
-  const [qty, setQty] = useState(0);
-  const [statusPesan, setStatusPesan] = useState('');
-  const [urlGambar, setUrlGambar] = useState('');
+  const [qty, setQty] = React.useState(0);
+  const [statusPesan, setStatusPesan] = React.useState('');
+  const [urlGambar, setUrlGambar] = React.useState('');
 
   const checkKeranjang = () => {
     if (keranjang.length) {
@@ -44,7 +44,7 @@ export default function ItemBelanja({
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     checkKeranjang();
     const bootstrapAsync = async () => {
       const url = await storage().ref(linkGambar).getDownloadURL();
@@ -117,13 +117,13 @@ export default function ItemBelanja({
       </View>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
-            <Text style={styles.btnText}>+</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={styles.BtnPlusMin}
             onPress={() => substract()}>
             <Text style={styles.btnText}>-</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.BtnPlusMin} onPress={() => add()}>
+            <Text style={styles.btnText}>+</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.QtyText}>{qty}</Text>

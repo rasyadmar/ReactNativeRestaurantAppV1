@@ -11,7 +11,7 @@ import ItemBulanRekapitulasi from './itemBulanRekapitulasi';
 import firestore from '@react-native-firebase/firestore';
 
 const RekapitulasiMenuPage = ({navigation}) => {
-  const [bulan, setBulan] = useState([]);
+  const [bulan, setBulan] = React.useState([]);
 
   function getUnique(array) {
     var uniqueArray = [];
@@ -54,7 +54,7 @@ const RekapitulasiMenuPage = ({navigation}) => {
       });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     getFireData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

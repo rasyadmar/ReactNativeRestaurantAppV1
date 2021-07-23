@@ -121,7 +121,7 @@ const DetailPelanggan = ({route, navigation}) => {
     return pesananIn;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     let unSubscribe = realtimeGetFire(namaPelanggan, nomorMeja);
     return () => {
       unSubscribe();

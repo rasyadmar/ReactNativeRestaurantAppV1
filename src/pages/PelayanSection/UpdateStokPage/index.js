@@ -44,13 +44,19 @@ const UpdatestokPage = () => {
   }
 
   const getFireData = () => {
-    firestore().collection('menu').onSnapshot(onResult, onError);
+    let unSubscribe = firestore()
+      .collection('menu')
+      .onSnapshot(onResult, onError);
+    return unSubscribe;
   };
   React.useEffect(() => {
-    getFireData();
-
+    let unSubscribe = getFireData();
+    return () => {
+      unSubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const filteringList = filter => {
     let newList = [];
     let newIdList = [];
@@ -66,11 +72,6 @@ const UpdatestokPage = () => {
     }
     setDisplayedList(newList);
     setDisplayedId(newIdList);
-  };
-  const getMenu = () => {
-    axios.get('http://0.0.0.0:3000/MenuSemua').then(res => {
-      setList(res.data);
-    });
   };
 
   return (
@@ -93,7 +94,7 @@ const UpdatestokPage = () => {
         {displayedList.map((item, i) => {
           return (
             <ItemStok
-              key={displayedId[i]}
+              key={i}
               idItemDiDB={displayedId[i]}
               namaItem={item.nama}
               jumlahItem={item.stok}

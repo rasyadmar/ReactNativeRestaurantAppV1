@@ -29,7 +29,7 @@ export default function ItemBelanja({
   linkGambar,
 }) {
   const [qty, setQty] = React.useState(0);
-  const [urlGambar, setUrlGambar] = React.useState(0);
+  const [urlGambar, setUrlGambar] = React.useState('');
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
@@ -58,7 +58,6 @@ export default function ItemBelanja({
     <View style={styles.itemContainer}>
       <Image
         source={{
-          // uri: `https://icotar.com/avatar/${namaItem}.png`,
           uri: urlGambar,
         }}
         style={styles.itemImage}

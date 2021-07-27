@@ -54,17 +54,18 @@ export default function QRScanPage({navigation}) {
   };
 
   const onSuccess = e => {
-    if (e.data === 'nariwipelanggan') {
+    // isi qr code dihilangkan untuk privasi
+    if (e.data === 'hayo2') { 
       regisFirebase();
       toMainPelanggan();
       console.log('asd');
-    } else if (e.data === 'nariwipelayan') {
+    } else if (e.data === 'hayo2') {
       AsyncStorage.setItem('loginpelayan', 'udahlogin');
       regisFirebase();
       toPelayan();
-    } else if (e.data === 'nariwimanagement') {
+    } else if (e.data === 'hayo2') {
       toLoginManagement();
-    } else if (e.data === 'nariwikasir') {
+    } else if (e.data === 'hayo2') {
       regisFirebase();
       toKasir();
     }
